@@ -1,6 +1,10 @@
 plugins {
-    id 'java'
+    id "java"
+    id "org.springframework.boot.conventions"
+    id "org.springframework.boot.integration-test"
 }
+
+description = "Spring Boot Others Integration Tests"
 
 group 'org.springframework.boot'
 version '2.6.0-SNAPSHOT'
@@ -16,4 +20,59 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+tasks.named("compileJava") {
+    // Try to turn them all off automatically
+    options.compilerArgs << '-Xlint:none'
+    options.compilerArgs << '-nowarn' // same as '-Xlint:none'
+
+    // Turn them off manually
+    options.compilerArgs << '-Xlint:-auxiliaryclass'
+    options.compilerArgs << '-Xlint:-cast'
+    options.compilerArgs << '-Xlint:-classfile'
+    options.compilerArgs << '-Xlint:-deprecation'
+    options.compilerArgs << '-Xlint:-dep-ann'
+    options.compilerArgs << '-Xlint:-divzero'
+    options.compilerArgs << '-Xlint:-empty'
+    options.compilerArgs << '-Xlint:-fallthrough'
+    options.compilerArgs << '-Xlint:-finally'
+    options.compilerArgs << '-Xlint:-options'
+    options.compilerArgs << '-Xlint:-overloads'
+    options.compilerArgs << '-Xlint:-overrides'
+    options.compilerArgs << '-Xlint:-path'
+    options.compilerArgs << '-Xlint:-processing'
+    options.compilerArgs << '-Xlint:-rawtypes'
+    options.compilerArgs << '-Xlint:-serial'
+    options.compilerArgs << '-Xlint:-static'
+    options.compilerArgs << '-Xlint:-try'
+    options.compilerArgs << '-Xlint:-unchecked'
+    options.compilerArgs << '-Xlint:-varargs'
+    options.compilerArgs << '-XDignore.symbol.file'
+}
+
+
+tasks.named("compileTestJava") {
+    // Try to turn them all off automatically
+    options.compilerArgs << '-Xlint:-auxiliaryclass'
+    options.compilerArgs << '-Xlint:-cast'
+    options.compilerArgs << '-Xlint:-classfile'
+    options.compilerArgs << '-Xlint:-deprecation'
+    options.compilerArgs << '-Xlint:-dep-ann'
+    options.compilerArgs << '-Xlint:-divzero'
+    options.compilerArgs << '-Xlint:-empty'
+    options.compilerArgs << '-Xlint:-fallthrough'
+    options.compilerArgs << '-Xlint:-finally'
+    options.compilerArgs << '-Xlint:-options'
+    options.compilerArgs << '-Xlint:-overloads'
+    options.compilerArgs << '-Xlint:-overrides'
+    options.compilerArgs << '-Xlint:-path'
+    options.compilerArgs << '-Xlint:-processing'
+    options.compilerArgs << '-Xlint:-rawtypes'
+    options.compilerArgs << '-Xlint:-serial'
+    options.compilerArgs << '-Xlint:-static'
+    options.compilerArgs << '-Xlint:-try'
+    options.compilerArgs << '-Xlint:-unchecked'
+    options.compilerArgs << '-Xlint:-varargs'
+    options.compilerArgs << '-XDignore.symbol.file'
 }

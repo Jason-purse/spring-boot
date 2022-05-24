@@ -59,8 +59,11 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * 延迟导入选择器  处理 EnableAutoConfiguration 的自动配置..
  * {@link DeferredImportSelector} to handle {@link EnableAutoConfiguration
- * auto-configuration}. This class can also be subclassed if a custom variant of
+ * auto-configuration}.
+ * 这个类能够被子类实现 - 如果需要一个自定义的EnableAutoConfiguration..
+ * This class can also be subclassed if a custom variant of
  * {@link EnableAutoConfiguration @EnableAutoConfiguration} is needed.
  *
  * @author Phillip Webb
@@ -120,8 +123,11 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 			return EMPTY_ENTRY;
 		}
 		AnnotationAttributes attributes = getAttributes(annotationMetadata);
+		// 拿到所有的EnableAutoConfiguration... 实现类...
 		List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes);
+		// 移除重复的》。。
 		configurations = removeDuplicates(configurations);
+		// 获取排除的..
 		Set<String> exclusions = getExclusions(annotationMetadata, attributes);
 		checkExcludedClasses(configurations, exclusions);
 		configurations.removeAll(exclusions);
@@ -136,6 +142,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	}
 
 	protected boolean isEnabled(AnnotationMetadata metadata) {
+		// 如果此类等于AutoConfigurationImportSelector ??,那么判断属性...
 		if (getClass() == AutoConfigurationImportSelector.class) {
 			return getEnvironment().getProperty(EnableAutoConfiguration.ENABLED_OVERRIDE_PROPERTY, Boolean.class, true);
 		}
@@ -174,6 +181,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	 * attributes}
 	 * @return a list of candidate configurations
 	 */
+	// 自动装配机制 采用SpringFacotirsLoader机制 加载所有符合的@Configuration类...
 	protected List<String> getCandidateConfigurations(AnnotationMetadata metadata, AnnotationAttributes attributes) {
 		List<String> configurations = SpringFactoriesLoader.loadFactoryNames(getSpringFactoriesLoaderFactoryClass(),
 				getBeanClassLoader());

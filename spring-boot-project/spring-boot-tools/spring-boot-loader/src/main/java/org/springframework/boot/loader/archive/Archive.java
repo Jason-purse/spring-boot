@@ -32,6 +32,9 @@ import org.springframework.boot.loader.Launcher;
 /**
  * An archive that can be launched by the {@link Launcher}.
  *
+ * Launcher 启动的archive ..
+ *
+ *
  * @author Phillip Webb
  * @since 1.0.0
  * @see JarFileArchive
@@ -39,6 +42,7 @@ import org.springframework.boot.loader.Launcher;
 public interface Archive extends Iterable<Archive.Entry>, AutoCloseable {
 
 	/**
+	 * 加载这个archive的URL
 	 * Returns a URL that can be used to load the archive.
 	 * @return the archive URL
 	 * @throws MalformedURLException if the URL is malformed
@@ -58,6 +62,11 @@ public interface Archive extends Iterable<Archive.Entry>, AutoCloseable {
 	 * required or {@code null} if all entries should be considered.
 	 * @param includeFilter filter used to determine which entries should be included in
 	 * the result or {@code null} if all entries should be included
+	 *
+	 * 返回内嵌的Archive(根据匹配指定的过滤器的entry)
+	 *
+	 *  过滤器用来限制 在sub-entry查询中额外的限制 ...
+	 *  includeFilter 被用来决定 entries 应该包括在 结果中 或者 如果为null 全部包括 ...
 	 * @return the nested archives
 	 * @throws IOException on IO error
 	 * @since 2.3.0
@@ -72,6 +81,8 @@ public interface Archive extends Iterable<Archive.Entry>, AutoCloseable {
 
 	/**
 	 * Returns nested {@link Archive}s for entries that match the specified filter.
+	 *
+	 * 根据指定 过滤器获取内嵌的Archive ...
 	 * @param filter the filter used to limit entries
 	 * @return nested archives
 	 * @throws IOException if nested archives cannot be read
@@ -85,6 +96,8 @@ public interface Archive extends Iterable<Archive.Entry>, AutoCloseable {
 
 	/**
 	 * Return a new iterator for the archive entries.
+	 *
+	 * 为archive entries 返回一个新的iterator
 	 * @deprecated since 2.3.0 for removal in 2.5.0 in favor of using
 	 * @see java.lang.Iterable#iterator()
 	 * {@link org.springframework.boot.loader.jar.JarFile} to access entries and
@@ -125,6 +138,7 @@ public interface Archive extends Iterable<Archive.Entry>, AutoCloseable {
 	}
 
 	/**
+	 * 返回这个archive 是暴露的(含义是否解压了的)
 	 * Return if the archive is exploded (already unpacked).
 	 * @return if the archive is exploded
 	 * @since 2.3.0
@@ -134,6 +148,7 @@ public interface Archive extends Iterable<Archive.Entry>, AutoCloseable {
 	}
 
 	/**
+	 * 关闭这个Archive  释放任何打开的资源
 	 * Closes the {@code Archive}, releasing any open resources.
 	 * @throws Exception if an error occurs during close processing
 	 * @since 2.2.0
@@ -145,6 +160,8 @@ public interface Archive extends Iterable<Archive.Entry>, AutoCloseable {
 
 	/**
 	 * Represents a single entry in the archive.
+	 *
+	 * 表示archive中的一个条目 ..
 	 */
 	interface Entry {
 
@@ -164,6 +181,8 @@ public interface Archive extends Iterable<Archive.Entry>, AutoCloseable {
 
 	/**
 	 * Strategy interface to filter {@link Entry Entries}.
+	 *
+	 * Entries 的过滤器策略接口 ...
 	 */
 	@FunctionalInterface
 	interface EntryFilter {

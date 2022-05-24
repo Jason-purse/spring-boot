@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests for {@link LaunchedURLClassLoader}.
- *
+ *	自定义类加载器的测试 ...
  * @author Dave Syer
  * @author Phillip Webb
  * @author Andy Wilkinson

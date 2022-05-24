@@ -25,7 +25,7 @@ import java.security.Permission;
 
 /**
  * Base class for extended variants of {@link java.util.jar.JarFile}.
- *
+ * 普通的JarFile 变种(扩展)
  * @author Phillip Webb
  */
 abstract class AbstractJarFile extends java.util.jar.JarFile {
@@ -70,8 +70,11 @@ abstract class AbstractJarFile extends java.util.jar.JarFile {
 	 * The type of a {@link JarFile}.
 	 */
 	enum JarFileType {
-
-		DIRECT, NESTED_DIRECTORY, NESTED_JAR
+		// jar 文件类型
+		//
+		DIRECT,
+		NESTED_DIRECTORY,
+		NESTED_JAR
 
 	}
 

@@ -29,6 +29,8 @@ import org.springframework.boot.loader.archive.ExplodedArchive;
  * included inside a {@code /BOOT-INF/lib} directory and that application classes are
  * included inside a {@code /BOOT-INF/classes} directory.
  *
+ * 一般来说 这是针对基于jar 的归档 启动器
+ *
  * @author Phillip Webb
  * @author Andy Wilkinson
  * @author Madhura Bhave

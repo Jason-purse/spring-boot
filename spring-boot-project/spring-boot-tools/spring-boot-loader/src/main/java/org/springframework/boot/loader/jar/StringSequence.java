@@ -23,6 +23,11 @@ import java.util.Objects;
  * {@link String}, {@link #subSequence(int, int)} operations will not copy the underlying
  * character array.
  *
+ * 由单个共享的字符串 支持的CharSequence .. 不像普通的常规字符串
+ * 这里的 .. subSequence ... 操作不会复制底层的字符串数组 ...
+ *
+ * 它是共享同一个字符串  ..
+ *
  * @author Phillip Webb
  */
 final class StringSequence implements CharSequence {
@@ -69,6 +74,8 @@ final class StringSequence implements CharSequence {
 		if (start == 0 && subSequenceEnd == this.end) {
 			return this;
 		}
+
+		// 字符串序列 ... 一个新的(一个字符串窗口 内容)
 		return new StringSequence(this.source, subSequenceStart, subSequenceEnd);
 	}
 

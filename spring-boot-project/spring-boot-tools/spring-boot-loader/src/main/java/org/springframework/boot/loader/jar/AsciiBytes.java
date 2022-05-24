@@ -22,6 +22,8 @@ import java.nio.charset.StandardCharsets;
  * Simple wrapper around a byte array that represents an ASCII. Used for performance
  * reasons to save constructing Strings for ZIP data.
  *
+ * 简单的一个包装器(包装具有ASCII 编码的 字节数组) .. 为了性能原因 ->  为压缩数据提供结构化字符串 ...
+ *
  * @author Phillip Webb
  * @author Andy Wilkinson
  */
@@ -235,6 +237,7 @@ final class AsciiBytes {
 		return this.string;
 	}
 
+	// 直接返回一个 new String ???
 	static String toString(byte[] bytes) {
 		return new String(bytes, StandardCharsets.UTF_8);
 	}
@@ -243,8 +246,10 @@ final class AsciiBytes {
 		// We're compatible with String's hashCode()
 		if (charSequence instanceof StringSequence) {
 			// ... but save making an unnecessary String for StringSequence
+			// 由于stringSequence 提供了一些不必要的字符串 ...
 			return charSequence.hashCode();
 		}
+
 		return charSequence.toString().hashCode();
 	}
 

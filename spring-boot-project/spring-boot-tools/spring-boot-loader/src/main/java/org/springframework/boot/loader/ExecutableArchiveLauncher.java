@@ -27,7 +27,7 @@ import org.springframework.boot.loader.archive.Archive;
 
 /**
  * Base class for executable archive {@link Launcher}s.
- *
+ * 可执行archive 的Launcher 的基类 ...
  * @author Phillip Webb
  * @author Andy Wilkinson
  * @author Madhura Bhave
@@ -35,6 +35,9 @@ import org.springframework.boot.loader.archive.Archive;
  */
 public abstract class ExecutableArchiveLauncher extends Launcher {
 
+	/**
+	 * manifest 中的一个 属性 ... 表示main 类 ..
+	 */
 	private static final String START_CLASS_ATTRIBUTE = "Start-Class";
 
 	protected static final String BOOT_CLASSPATH_INDEX_ATTRIBUTE = "Spring-Boot-Classpath-Index";

@@ -34,6 +34,8 @@ import org.springframework.boot.loader.jar.JarFile;
  * Base class for launchers that can start an application with a fully configured
  * classpath backed by one or more {@link Archive}s.
  *
+ * 启动器的基类(它能够启动一个应用 - (这个应用完全由一个或者多个归档文件支持的类路径应用)
+ *
  * @author Phillip Webb
  * @author Dave Syer
  * @since 1.0.0
@@ -148,15 +150,30 @@ public abstract class Launcher {
 		throw new IllegalStateException("Unexpected call to getClassPathArchives()");
 	}
 
+	// 创建一个Archive ...
+
+	/**
+	 * 所以从这个方法上看
+	 * spring boot 必然会对spring boot maven plugin  打包时对Archive的保护域做手脚 ...
+	 * @return
+	 * @throws Exception
+	 */
 	protected final Archive createArchive() throws Exception {
+		// 或者这个类的 保护域
 		ProtectionDomain protectionDomain = getClass().getProtectionDomain();
+		// 获取保护域中的代码源(也可以说叫做代码基)
 		CodeSource codeSource = protectionDomain.getCodeSource();
+
+		// 通过它获取Location ...
 		URI location = (codeSource != null) ? codeSource.getLocation().toURI() : null;
+		// 获取 Scheme规范部分内容 ...
 		String path = (location != null) ? location.getSchemeSpecificPart() : null;
 		if (path == null) {
 			throw new IllegalStateException("Unable to determine code source archive");
 		}
+		// 然后根据这个路径 获取文件 ...
 		File root = new File(path);
+		// 如果文件不存在,那么   抛出异常 ...
 		if (!root.exists()) {
 			throw new IllegalStateException("Unable to determine code source archive from " + root);
 		}

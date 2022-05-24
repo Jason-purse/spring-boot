@@ -33,6 +33,9 @@ import java.util.regex.Pattern;
 /**
  * {@link URLStreamHandler} for Spring Boot loader {@link JarFile}s.
  *
+ * Spring boot JarFile 加载器 的URLStreamHandler ..
+ *
+ * see   spring-boot-others-test module -> test(ClassLoaderTests)
  * @author Phillip Webb
  * @author Andy Wilkinson
  * @since 1.0.0
@@ -43,28 +46,38 @@ public class Handler extends URLStreamHandler {
 	// NOTE: in order to be found as a URL protocol handler, this class must be public,
 	// must be named Handler and must be in a package ending '.jar'
 
+	// 为了作为一个URL 协议处理器发现, 这个类必须是一个公开的, 必须命名为Handler 并且必须在以.jar结尾的包中 ...
+	// 这是什么规范  ...?? 滑稽 .
+
 	private static final String JAR_PROTOCOL = "jar:";
 
 	private static final String FILE_PROTOCOL = "file:";
 
+	// 这里使用了业界标杆 tomcat war规范 ..
 	private static final String TOMCAT_WARFILE_PROTOCOL = "war:file:";
 
+	// jar 规范路径分隔符 ..
 	private static final String SEPARATOR = "!/";
-
+	// 正则 ...
 	private static final Pattern SEPARATOR_PATTERN = Pattern.compile(SEPARATOR, Pattern.LITERAL);
 
+	// 当前目录 ...
 	private static final String CURRENT_DIR = "/./";
 
 	private static final Pattern CURRENT_DIR_PATTERN = Pattern.compile(CURRENT_DIR, Pattern.LITERAL);
 
+	// 父级目录
 	private static final String PARENT_DIR = "/../";
 
+	// 协议处理器 .. ??
 	private static final String PROTOCOL_HANDLER = "java.protocol.handler.pkgs";
 
+	// 降级处理器(兜底操作)
 	private static final String[] FALLBACK_HANDLERS = { "sun.net.www.protocol.jar.Handler" };
 
 	private static URL jarContextUrl;
 
+	// 软引用(当内存受到限制,就gc)
 	private static SoftReference<Map<File, JarFile>> rootFileCache;
 
 	static {
@@ -83,8 +96,10 @@ public class Handler extends URLStreamHandler {
 		this.jarFile = jarFile;
 	}
 
+	// 处理一个打开连接操作 ..
 	@Override
 	protected URLConnection openConnection(URL url) throws IOException {
+		// 如果jarFile 不为空,并且 URL 在jar文件内部 ...
 		if (this.jarFile != null && isUrlInJarFile(url, this.jarFile)) {
 			return JarURLConnection.get(url, this.jarFile);
 		}
@@ -97,6 +112,7 @@ public class Handler extends URLStreamHandler {
 	}
 
 	private boolean isUrlInJarFile(URL url, JarFile jarFile) throws MalformedURLException {
+		// 每次先尝试通过path 构建一个新的url ...
 		// Try the path first to save building a new url string each time
 		return url.getPath().startsWith(jarFile.getUrl().getPath())
 				&& url.toString().startsWith(jarFile.getUrlString());
@@ -457,6 +473,8 @@ public class Handler extends URLStreamHandler {
 	 * Set if a generic static exception can be thrown when a URL cannot be connected.
 	 * This optimization is used during class loading to save creating lots of exceptions
 	 * which are then swallowed.
+	 *
+	 * 避免一次性创建 大量的异常(允许高吞吐量) .. 当URL 不能够连接的时候 ... 指定通用的静态异常能够被抛出 ....
 	 * @param useFastConnectionExceptions if fast connection exceptions can be used.
 	 */
 	public static void setUseFastConnectionExceptions(boolean useFastConnectionExceptions) {

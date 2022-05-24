@@ -30,7 +30,7 @@ import java.security.Permission;
 
 /**
  * {@link java.net.JarURLConnection} used to support {@link JarFile#getUrl()}.
- *
+ *  通过此 JarURLConnection 连接支持 JarFile#getUrl ...
  * @author Phillip Webb
  * @author Andy Wilkinson
  * @author Rostyslav Dudka
@@ -42,6 +42,7 @@ final class JarURLConnection extends java.net.JarURLConnection {
 	private static final FileNotFoundException FILE_NOT_FOUND_EXCEPTION = new FileNotFoundException(
 			"Jar file or entry not found");
 
+	// 没有发现的连接异常(导致原因  文件没有发现)
 	private static final IllegalStateException NOT_FOUND_CONNECTION_EXCEPTION = new IllegalStateException(
 			FILE_NOT_FOUND_EXCEPTION);
 
@@ -54,6 +55,8 @@ final class JarURLConnection extends java.net.JarURLConnection {
 			EMPTY_JAR_URL = new URL("jar:", null, 0, "file:!/", new URLStreamHandler() {
 				@Override
 				protected URLConnection openConnection(URL u) throws IOException {
+
+					//保留一个URLStreamHandler 阻止错误的JAR Handler 被实例化且缓存
 					// Stub URLStreamHandler to prevent the wrong JAR Handler from being
 					// Instantiated and cached.
 					return null;
@@ -81,6 +84,7 @@ final class JarURLConnection extends java.net.JarURLConnection {
 
 	private JarURLConnection(URL url, AbstractJarFile jarFile, JarEntryName jarEntryName) throws IOException {
 		// What we pass to super is ultimately ignored
+		// super 最终是忽略的  ...
 		super(EMPTY_JAR_URL);
 		this.url = url;
 		this.jarFile = jarFile;
@@ -266,6 +270,7 @@ final class JarURLConnection extends java.net.JarURLConnection {
 		return new JarURLConnection(url, jarFile.getWrapper(), jarEntryName);
 	}
 
+	// 根规范 index 位置 ..
 	private static int indexOfRootSpec(StringSequence file, String pathFromRoot) {
 		int separatorIndex = file.indexOf(SEPARATOR);
 		if (separatorIndex < 0 || !file.startsWith(pathFromRoot, separatorIndex)) {
@@ -284,14 +289,18 @@ final class JarURLConnection extends java.net.JarURLConnection {
 	}
 
 	private static JarURLConnection notFound(JarFile jarFile, JarEntryName jarEntryName) throws IOException {
+		// 根据线程 上下文变量获取 是否使用快速异常 .. 如果是 直接返回没有发现的连接(穷举变量) ...
 		if (Boolean.TRUE.equals(useFastExceptions.get())) {
 			return NOT_FOUND_CONNECTION;
 		}
+		// 否则创建一个新的连接返回 ...
 		return new JarURLConnection(null, jarFile, jarEntryName);
 	}
 
 	/**
 	 * A JarEntryName parsed from a URL String.
+	 *
+	 * 根据URL 字符串解析JarEntryName ...
 	 */
 	static class JarEntryName {
 
@@ -303,23 +312,30 @@ final class JarURLConnection extends java.net.JarURLConnection {
 			this.name = decode(spec);
 		}
 
+		// 解码 JarEntry 名称
 		private StringSequence decode(StringSequence source) {
+			// 不需要解码
 			if (source.isEmpty() || (source.indexOf('%') < 0)) {
 				return source;
 			}
 			ByteArrayOutputStream bos = new ByteArrayOutputStream(source.length());
+			// 写入
 			write(source.toString(), bos);
 			// AsciiBytes is what is used to store the JarEntries so make it symmetric
+			// ascillBytes 直接 被用来存储 JarEntry  - 因此让它对称 ...
 			return new StringSequence(AsciiBytes.toString(bos.toByteArray()));
 		}
-
+		// 写入过程中编码 ...
 		private void write(String source, ByteArrayOutputStream outputStream) {
 			int length = source.length();
 			for (int i = 0; i < length; i++) {
 				int c = source.charAt(i);
+				// 超过了 ascill 编码集最大码数 ...
 				if (c > 127) {
 					try {
+						// 编码 ...
 						String encoded = URLEncoder.encode(String.valueOf((char) c), "UTF-8");
+						// 写入
 						write(encoded, outputStream);
 					}
 					catch (UnsupportedEncodingException ex) {
@@ -327,6 +343,7 @@ final class JarURLConnection extends java.net.JarURLConnection {
 					}
 				}
 				else {
+					// 解码 ..
 					if (c == '%') {
 						if ((i + 2) >= length) {
 							throw new IllegalArgumentException(
@@ -369,10 +386,14 @@ final class JarURLConnection extends java.net.JarURLConnection {
 			return this.contentType;
 		}
 
+		// 解读 内容类型  ..
 		private String deduceContentType() {
+			// 猜测一下内容类型  不要打扰流，因为不支持标记
 			// Guess the content type, don't bother with streams as mark is not supported
 			String type = isEmpty() ? "x-java/jar" : null;
+			// 根据名称进行 猜测 ...
 			type = (type != null) ? type : guessContentTypeFromName(toString());
+			// 然后未知
 			type = (type != null) ? type : "content/unknown";
 			return type;
 		}
