@@ -4,6 +4,9 @@ import org.junit.jupiter.api.Test;
 import sun.misc.Launcher;
 
 import java.io.File;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.net.JarURLConnection;
 
 /**
@@ -18,7 +21,7 @@ import java.net.JarURLConnection;
  * 其次 {@link org.springframework.boot.loader.jar.Handler} 为什么 一定叫Handler 这个名字?  并且需要放置在以 .jar 结尾的package 中 ..
  */
 public class ClassLoaderTests {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
 		//FileTypeTests.main(null);
 		FileTests.main(null);
 	}
@@ -60,11 +63,26 @@ public class ClassLoaderTests {
 	public static class FileTests {
 
 
-		public static void main(String[] args) {
+		public static void main(String[] args) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 			// 只能够读取本地文件 ...
 			System.out.println(new File("http://jianyue-face.oss-cn-shanghai.aliyuncs.com/files/drown-guard/images/26AFACF68AB1420B902A0C6E57BF8572.jpeg")
 					.exists());
 			// file .
+
+			class A {
+				private A() {
+
+				}
+			}
+
+			// 这是一个逃狱方法,让一些对象  可以访问 ..
+			final Constructor<A> declaredConstructor = A.class.getDeclaredConstructor();
+			AccessibleObject.setAccessible(new AccessibleObject[] {declaredConstructor},true);
+
+
+			System.out.println(declaredConstructor.isAccessible());
+			final A a = declaredConstructor.newInstance();
+			System.out.println(a);
 		}
 	}
 
