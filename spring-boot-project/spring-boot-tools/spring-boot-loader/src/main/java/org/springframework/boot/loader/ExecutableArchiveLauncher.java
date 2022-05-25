@@ -48,7 +48,9 @@ public abstract class ExecutableArchiveLauncher extends Launcher {
 
 	public ExecutableArchiveLauncher() {
 		try {
+			// 创建归档 ..
 			this.archive = createArchive();
+			// 创建ClassPath Index 文件..
 			this.classPathIndex = getClassPathIndex(this.archive);
 		}
 		catch (Exception ex) {
@@ -65,7 +67,7 @@ public abstract class ExecutableArchiveLauncher extends Launcher {
 			throw new IllegalStateException(ex);
 		}
 	}
-
+	// 默认为空 ..
 	protected ClassPathIndexFile getClassPathIndex(Archive archive) throws IOException {
 		return null;
 	}
@@ -75,8 +77,10 @@ public abstract class ExecutableArchiveLauncher extends Launcher {
 		Manifest manifest = this.archive.getManifest();
 		String mainClass = null;
 		if (manifest != null) {
+			// 获取清单中的入口类(本质上 spring boot maven plugin 插件将 入口类设置为了start_class 属性)  ..
 			mainClass = manifest.getMainAttributes().getValue(START_CLASS_ATTRIBUTE);
 		}
+		// 否则直接报错 ..
 		if (mainClass == null) {
 			throw new IllegalStateException("No 'Start-Class' manifest entry specified in " + this);
 		}
@@ -104,15 +108,22 @@ public abstract class ExecutableArchiveLauncher extends Launcher {
 
 	@Override
 	protected Iterator<Archive> getClassPathArchivesIterator() throws Exception {
+		// 查询候选过滤器 ...
+		// 查看JarLauncher  它指定了/BOOT-INF/目录下面的归档进行处理 ...
 		Archive.EntryFilter searchFilter = this::isSearchCandidate;
+		// 返回内嵌的所有Archive 用来构建类路径 ...
 		Iterator<Archive> archives = this.archive.getNestedArchives(searchFilter,
+				// 同样JarLauncher 制定了 BOOT-INF/lib下的归档文件 增加到类路径上 ...
 				(entry) -> isNestedArchive(entry) && !isEntryIndexed(entry));
+		// 是否后置处理 类路径Archives ...
 		if (isPostProcessingClassPathArchives()) {
 			archives = applyClassPathArchivePostProcessing(archives);
 		}
 		return archives;
 	}
 
+
+	// 是否可被索引
 	private boolean isEntryIndexed(Archive.Entry entry) {
 		if (this.classPathIndex != null) {
 			return this.classPathIndex.containsEntry(entry.getName());
@@ -142,6 +153,8 @@ public abstract class ExecutableArchiveLauncher extends Launcher {
 	/**
 	 * Determine if the specified entry is a nested item that should be added to the
 	 * classpath.
+	 *
+	 * 决定特定的entry 是否是一个内嵌的Item(是否应该增加到类路径上)
 	 * @param entry the entry to check
 	 * @return {@code true} if the entry is a nested item (jar or directory)
 	 */
@@ -152,6 +165,8 @@ public abstract class ExecutableArchiveLauncher extends Launcher {
 	 * compatibility this method returns {@code true}, but subclasses that don't override
 	 * {@link #postProcessClassPathArchives(List)} should provide an implementation that
 	 * returns {@code false}.
+	 *
+	 *  向后兼容 返回true 如果子类没有覆盖postProce.... 应该提供一个返回false 的实现 ..
 	 * @return if the {@link #postProcessClassPathArchives(List)} method is implemented
 	 * @since 2.3.0
 	 */

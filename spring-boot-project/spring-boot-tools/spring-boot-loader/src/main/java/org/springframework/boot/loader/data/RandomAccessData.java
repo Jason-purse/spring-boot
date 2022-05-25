@@ -24,6 +24,10 @@ import java.io.InputStream;
  * Interface that provides read-only random access to some underlying data.
  * Implementations must allow concurrent reads in a thread-safe manner.
  *
+ * 随机访问数据接口规范
+ * 这个接口提供了只读随机访问 某些底层的数据
+ * 实现必须允许并发读取(在线程安全的方式下)
+ *
  * @author Phillip Webb
  * @since 1.0.0
  */
@@ -39,6 +43,7 @@ public interface RandomAccessData {
 
 	/**
 	 * Returns a new {@link RandomAccessData} for a specific subsection of this data.
+	 * 获取指定区域的一小段 ...
 	 * @param offset the offset of the subsection
 	 * @param length the length of the subsection
 	 * @return the subsection data
@@ -47,6 +52,7 @@ public interface RandomAccessData {
 
 	/**
 	 * Reads all the data and returns it as a byte array.
+	 * 返回所有的数据并 byte[]
 	 * @return the data
 	 * @throws IOException if the data cannot be read
 	 */
@@ -54,6 +60,7 @@ public interface RandomAccessData {
 
 	/**
 	 * Reads the {@code length} bytes of data starting at the given {@code offset}.
+	 * 根据给定的偏距 读取剩下所有的字节 ...
 	 * @param offset the offset from which data should be read
 	 * @param length the number of bytes to be read
 	 * @return the data

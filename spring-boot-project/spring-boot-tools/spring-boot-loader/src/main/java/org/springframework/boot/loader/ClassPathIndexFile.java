@@ -34,13 +34,16 @@ import java.util.stream.Collectors;
 /**
  * A class path index file that provides ordering information for JARs.
  *
+ * 类路径索引文件 提供了JAR的清单信息...
+ *
  * @author Madhura Bhave
  * @author Phillip Webb
  */
 final class ClassPathIndexFile {
-
+	// 根文件
 	private final File root;
 
+	// lines
 	private final List<String> lines;
 
 	private ClassPathIndexFile(File root, List<String> lines) {
@@ -79,6 +82,7 @@ final class ClassPathIndexFile {
 		}
 	}
 
+	// 根据可能的根root url 给定location 进行读取 ..
 	static ClassPathIndexFile loadIfPossible(URL root, String location) throws IOException {
 		return loadIfPossible(asFile(root), location);
 	}
@@ -88,7 +92,9 @@ final class ClassPathIndexFile {
 	}
 
 	private static ClassPathIndexFile loadIfPossible(File root, File indexFile) throws IOException {
+		// 索引文件存在 并且是一个file
 		if (indexFile.exists() && indexFile.isFile()) {
+			// 创建 输入流 读取.
 			try (InputStream inputStream = new FileInputStream(indexFile)) {
 				return new ClassPathIndexFile(root, loadLines(inputStream));
 			}
@@ -110,13 +116,16 @@ final class ClassPathIndexFile {
 	}
 
 	private static File asFile(URL url) {
+		// 需要file 协议
 		if (!"file".equals(url.getProtocol())) {
 			throw new IllegalArgumentException("URL does not reference a file");
 		}
 		try {
+			// 返回新的文件
 			return new File(url.toURI());
 		}
 		catch (URISyntaxException ex) {
+			// 否则尝试获取路径 创建新的文件
 			return new File(url.getPath());
 		}
 	}

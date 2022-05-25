@@ -39,9 +39,17 @@ import org.springframework.boot.loader.data.RandomAccessData;
  * offset to the central directory record and {@code positions} provides the original
  * order position of the entry. The arrays are stored in hashCode order so that a binary
  * search can be used to find a name.
+ *
+ * 提供访问JarFile 中的entries,为了减少内存消耗，entry详情使用数组存储 ...
+ * 并且hashCodes 数组存储了entry name的hashCode ..
+ * centralDirectoryOffsets 提供了 central directory record的 offset
+ * positions 提供了entry 的顺序位置 ...
+ * 此数组 根据hashCode 的顺序进行存储 .. 因此 二分查找能够被用来查找一个名字 ...
  * <p>
  * A typical Spring Boot application will have somewhere in the region of 10,500 entries
  * which should consume about 122K.
+ *
+ * 一个通常的Springboot 应用应该 有10，500 个条目  通常消耗 122kb
  *
  * @author Phillip Webb
  * @author Andy Wilkinson
@@ -70,7 +78,7 @@ class JarFileEntries implements CentralDirectoryVisitor, Iterable<JarEntry> {
 		}
 		RUNTIME_VERSION = version;
 	}
-
+	// 本地文件头基础内容 30 ...
 	private static final long LOCAL_FILE_HEADER_SIZE = 30;
 
 	private static final char SLASH = '/';
@@ -79,6 +87,7 @@ class JarFileEntries implements CentralDirectoryVisitor, Iterable<JarEntry> {
 
 	protected static final int ENTRY_CACHE_SIZE = 25;
 
+	// 此本地文件头  所在的JarFile ...
 	private final JarFile jarFile;
 
 	private final JarEntryFilter filter;
@@ -87,6 +96,7 @@ class JarFileEntries implements CentralDirectoryVisitor, Iterable<JarEntry> {
 
 	private int size;
 
+	// entries name的 hashCode s...
 	private int[] hashCodes;
 
 	private Offsets centralDirectoryOffsets;
@@ -111,6 +121,7 @@ class JarFileEntries implements CentralDirectoryVisitor, Iterable<JarEntry> {
 		this.jarFile = jarFile;
 		this.filter = filter;
 		if (RUNTIME_VERSION == BASE_VERSION) {
+			// 不同发行版的Jar 标志 ...
 			this.multiReleaseJar = false;
 		}
 	}
@@ -431,6 +442,10 @@ class JarFileEntries implements CentralDirectoryVisitor, Iterable<JarEntry> {
 	 * Interface to manage offsets to central directory records. Regular zip files are
 	 * backed by an {@code int[]} based implementation, Zip64 files are backed by a
 	 * {@code long[]} and will consume more memory.
+	 *
+	 * 一个接口 管理中央目录记录的偏距 ..
+	 * 普通的zip 文件 是由 int[]支持的基础实现 ...
+	 * zip64 由long[] 支持且消耗更多内存 ....
 	 */
 	private interface Offsets {
 
@@ -440,8 +455,11 @@ class JarFileEntries implements CentralDirectoryVisitor, Iterable<JarEntry> {
 
 		void swap(int i, int j);
 
+		// 根据给定的中央目录end Record ...
 		static Offsets from(CentralDirectoryEndRecord endRecord) {
+			// 获取 entries size
 			int size = endRecord.getNumberOfRecords();
+			// 判断是不是isZip64, 如果是 zip64 Offsets ... 否则普通的ZipOffsets
 			return endRecord.isZip64() ? new Zip64Offsets(size) : new ZipOffsets(size);
 		}
 

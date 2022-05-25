@@ -188,3 +188,22 @@ The https://spring.io/[spring.io] site contains several guides that show how to 
 == License
 Spring Boot is Open Source software released under the https://www.apache.org/licenses/LICENSE-2.0.html[Apache 2.0 license].
 
+
+
+
+
+== Manifest 示例
+   Manifest-Version: 1.0
+   Created-By: Maven Jar Plugin 3.2.0
+   Build-Jdk-Spec: 17
+   Implementation-Title: jicofo
+   Implementation-Version: 1.1-
+   Implementation-Vendor: jitsi.org
+   Main-Class: org.springframework.boot.loader.JarLauncher
+   Start-Class: org.jitsi.jicofo.JicofoApplication
+   Spring-Boot-Version: 2.3.1.RELEASE
+   Spring-Boot-Classes: BOOT-INF/classes/
+   Spring-Boot-Lib: BOOT-INF/lib/
+   Spring-Boot-Classpath-Index: BOOT-INF/classpath.idx
+
+

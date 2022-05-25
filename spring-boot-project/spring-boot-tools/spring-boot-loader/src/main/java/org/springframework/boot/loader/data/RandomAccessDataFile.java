@@ -26,6 +26,7 @@ import java.io.RandomAccessFile;
 /**
  * {@link RandomAccessData} implementation backed by a {@link RandomAccessFile}.
  *
+ * RandomAccessFile 支持的 RandomAccessData ..
  * @author Phillip Webb
  * @author Andy Wilkinson
  * @since 1.0.0
@@ -202,6 +203,9 @@ public class RandomAccessDataFile implements RandomAccessData {
 
 	}
 
+	/**
+	 * 文件访问 ...
+	 */
 	private static final class FileAccess {
 
 		private final Object monitor = new Object();

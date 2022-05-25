@@ -23,7 +23,7 @@ import org.springframework.util.ClassUtils;
 
 /**
  * Delegate class used to launch the fat jar in a specific mode.
- *
+ *  一个代理类(用来在指定的模式下启动 丰满的jar)
  * @author Phillip Webb
  * @since 2.3.0
  */

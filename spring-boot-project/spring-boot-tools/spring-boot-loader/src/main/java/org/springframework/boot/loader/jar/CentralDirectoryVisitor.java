@@ -20,15 +20,18 @@ import org.springframework.boot.loader.data.RandomAccessData;
 
 /**
  * Callback visitor triggered by {@link CentralDirectoryParser}.
- *
+ * 由 CentralDirectoryParser 触发的回调访问者
  * @author Phillip Webb
  */
 interface CentralDirectoryVisitor {
 
+	// 访问开始回调
 	void visitStart(CentralDirectoryEndRecord endRecord, RandomAccessData centralDirectoryData);
 
+	// 访问文件头
 	void visitFileHeader(CentralDirectoryFileHeader fileHeader, long dataOffset);
 
+	// 访问结束回调
 	void visitEnd();
 
 }

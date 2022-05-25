@@ -19,6 +19,7 @@ package org.springframework.boot.loader.jar;
 /**
  * Interface that can be used to filter and optionally rename jar entries.
  *
+ * 这是一个接口, 此过滤器被用来可选的重命名jar 实体 ...
  * @author Phillip Webb
  */
 interface JarEntryFilter {

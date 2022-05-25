@@ -45,6 +45,8 @@ public abstract class Launcher {
 	private static final String JAR_MODE_LAUNCHER = "org.springframework.boot.loader.jarmode.JarModeLauncher";
 
 	/**
+	 *
+	 * 启动应用的核心方法 这个方法是一个入口 - 它应该由子类的main 方法调用 ..
 	 * Launch the application. This method is the initial entry point that should be
 	 * called by a subclass {@code public static void main(String[] args)} method.
 	 * @param args the incoming arguments
@@ -52,6 +54,7 @@ public abstract class Launcher {
 	 */
 	protected void launch(String[] args) throws Exception {
 		if (!isExploded()) {
+			// 如果处于非分解模式,注册URL 协议处理器 ...
 			JarFile.registerUrlProtocolHandler();
 		}
 		ClassLoader classLoader = createClassLoader(getClassPathArchivesIterator());
@@ -130,6 +133,7 @@ public abstract class Launcher {
 
 	/**
 	 * Returns the archives that will be used to construct the class path.
+	 * 返回归档文件(将被用来构建类路径)
 	 * @return the class path archives
 	 * @throws Exception if the class path archives cannot be obtained
 	 * @since 2.3.0
@@ -172,11 +176,14 @@ public abstract class Launcher {
 			throw new IllegalStateException("Unable to determine code source archive");
 		}
 		// 然后根据这个路径 获取文件 ...
+		// 既然如此  它应该是一个
 		File root = new File(path);
 		// 如果文件不存在,那么   抛出异常 ...
 		if (!root.exists()) {
 			throw new IllegalStateException("Unable to determine code source archive from " + root);
 		}
+
+		// 如果是一个目录,那么一个分离的Archive(就相当于没有压缩), 否则JarFile...
 		return (root.isDirectory() ? new ExplodedArchive(root) : new JarFileArchive(root));
 	}
 
@@ -184,6 +191,10 @@ public abstract class Launcher {
 	 * Returns if the launcher is running in an exploded mode. If this method returns
 	 * {@code true} then only regular JARs are supported and the additional URL and
 	 * ClassLoader support infrastructure can be optimized.
+	 *
+	 * 如果为true, 表示运行在一个分解模式 ...(有些explode 我翻译成了 暴露,error)
+	 * 如果为true,那么仅仅支持普通的Jar 以及额外的URL 和 类加载器支持基础设施能够被优化 。。
+	 *
 	 * @return if the jar is exploded.
 	 * @since 2.3.0
 	 */

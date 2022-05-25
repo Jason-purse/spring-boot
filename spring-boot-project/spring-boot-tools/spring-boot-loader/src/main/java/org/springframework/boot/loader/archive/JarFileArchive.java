@@ -41,6 +41,8 @@ import org.springframework.boot.loader.jar.JarFile;
 /**
  * {@link Archive} implementation backed by a {@link JarFile}.
  *
+ * 由JarFile 支持的一个Archive 实现
+ * 这意味着 Archive 可以是一个内嵌的Jar ... 或者目录条目
  * @author Phillip Webb
  * @author Andy Wilkinson
  * @since 1.0.0
@@ -53,6 +55,7 @@ public class JarFileArchive implements Archive {
 
 	private static final FileAttribute<?>[] NO_FILE_ATTRIBUTES = {};
 
+	// 所有者读 / 写 / 执行 ...(Posix)
 	private static final EnumSet<PosixFilePermission> DIRECTORY_PERMISSIONS = EnumSet.of(PosixFilePermission.OWNER_READ,
 			PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE);
 
@@ -93,6 +96,9 @@ public class JarFileArchive implements Archive {
 
 	@Override
 	public Iterator<Archive> getNestedArchives(EntryFilter searchFilter, EntryFilter includeFilter) throws IOException {
+
+		// 直接覆盖,创建一个内嵌Archive 的迭代器 ...
+
 		return new NestedArchiveIterator(this.jarFile.iterator(), searchFilter, includeFilter);
 	}
 
@@ -108,11 +114,15 @@ public class JarFileArchive implements Archive {
 	}
 
 	protected Archive getNestedArchive(Entry entry) throws IOException {
+
 		JarEntry jarEntry = ((JarFileEntry) entry).getJarEntry();
+		// 获取注释 以UNPACK_MARKER ...
+		// 表示它应该解压 ..
 		if (jarEntry.getComment().startsWith(UNPACK_MARKER)) {
 			return getUnpackedNestedArchive(jarEntry);
 		}
 		try {
+			// 否则内嵌Jar ...
 			JarFile jarFile = this.jarFile.getNestedJarFile(jarEntry);
 			return new JarFileArchive(jarFile);
 		}
@@ -126,7 +136,9 @@ public class JarFileArchive implements Archive {
 		if (name.lastIndexOf('/') != -1) {
 			name = name.substring(name.lastIndexOf('/') + 1);
 		}
+		// 获取临时未解压的目录 ... 进行解析 .. 创建一个相对目录(对想要的东西进行解压)
 		Path path = getTempUnpackDirectory().resolve(name);
+		// 如果路径不存在 或者 文件尺寸和当前entry的尺寸对不上,应该解压
 		if (!Files.exists(path) || Files.size(path) != jarEntry.getSize()) {
 			unpack(jarEntry, path);
 		}
@@ -135,7 +147,9 @@ public class JarFileArchive implements Archive {
 
 	private Path getTempUnpackDirectory() {
 		if (this.tempUnpackDirectory == null) {
+			// 如果没有临时Unpack(解压) 目录,直接通过系统属性获取 。。。
 			Path tempDirectory = Paths.get(System.getProperty("java.io.tmpdir"));
+			// 并进行创建
 			this.tempUnpackDirectory = createUnpackDirectory(tempDirectory);
 		}
 		return this.tempUnpackDirectory;
@@ -151,17 +165,27 @@ public class JarFileArchive implements Archive {
 				return unpackDirectory;
 			}
 			catch (IOException ex) {
+				// 可能重复了 ...
 			}
 		}
 		throw new IllegalStateException("Failed to create unpack directory in directory '" + parent + "'");
 	}
 
+	// unpack
+	// 所以就算打包到Jar中之后,也需要通过解压的方式 将所有的依赖复制到目标路径上 ...
 	private void unpack(JarEntry entry, Path path) throws IOException {
+		// 创建这个文件
 		createFile(path);
+		// 退出的时候删除 ..
+		// 虚拟机退出的时候,根据它们注册的相反顺序进行删除)
+		// 现在不删除的原因是为了缓存 ....
+		// 但是这也有危险把,别人清理了tmp目录 缓存就没了 ....
 		path.toFile().deleteOnExit();
+		// 这里其实应该是拷贝一份,为什么不用Files.copy 呢 ...
 		try (InputStream inputStream = this.jarFile.getInputStream(entry);
 				OutputStream outputStream = Files.newOutputStream(path, StandardOpenOption.WRITE,
 						StandardOpenOption.TRUNCATE_EXISTING)) {
+			// 1KB
 			byte[] buffer = new byte[BUFFER_SIZE];
 			int bytesRead;
 			while ((bytesRead = inputStream.read(buffer)) != -1) {
@@ -172,6 +196,7 @@ public class JarFileArchive implements Archive {
 	}
 
 	private void createDirectory(Path path) throws IOException {
+		// 创建一个目录 ... 根据路径对应的文件系统 ... 需要设定目录权限
 		Files.createDirectory(path, getFileAttributes(path.getFileSystem(), DIRECTORY_PERMISSIONS));
 	}
 
@@ -230,6 +255,7 @@ public class JarFileArchive implements Archive {
 
 		private Entry poll() {
 			while (this.iterator.hasNext()) {
+				// 根据对应的JarEntry 获取指定的JarFileEntry ...
 				JarFileEntry candidate = new JarFileEntry(this.iterator.next());
 				if ((this.searchFilter == null || this.searchFilter.matches(candidate))
 						&& (this.includeFilter == null || this.includeFilter.matches(candidate))) {
@@ -261,6 +287,8 @@ public class JarFileArchive implements Archive {
 
 	/**
 	 * Nested {@link Archive} iterator implementation backed by {@link JarEntry}.
+	 *
+	 * 内嵌的Archive 迭代器实现(由JarEntry 支持的)
 	 */
 	private class NestedArchiveIterator extends AbstractIterator<Archive> {
 
@@ -268,6 +296,11 @@ public class JarFileArchive implements Archive {
 			super(iterator, searchFilter, includeFilter);
 		}
 
+		/**
+		 * 实现适配
+		 * @param entry JarEntry(java.util....)
+		 * @return 进行适配
+		 */
 		@Override
 		protected Archive adapt(Entry entry) {
 			try {
@@ -282,6 +315,8 @@ public class JarFileArchive implements Archive {
 
 	/**
 	 * {@link Archive.Entry} implementation backed by a {@link JarEntry}.
+	 *
+	 * 由JarEntry 支持的一个Entry 实现 ..
 	 */
 	private static class JarFileEntry implements Entry {
 

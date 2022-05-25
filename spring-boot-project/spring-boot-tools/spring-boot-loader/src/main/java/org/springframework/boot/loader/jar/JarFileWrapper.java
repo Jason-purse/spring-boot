@@ -31,6 +31,8 @@ import java.util.zip.ZipEntry;
  * A wrapper used to create a copy of a {@link JarFile} so that it can be safely closed
  * without closing the original.
  *
+ * 一个包装器 被用来创建JarFile 的复制品(因此它能够安全的关闭 - 而不会关闭原始的文件)
+ *
  * @author Phillip Webb
  */
 class JarFileWrapper extends AbstractJarFile {

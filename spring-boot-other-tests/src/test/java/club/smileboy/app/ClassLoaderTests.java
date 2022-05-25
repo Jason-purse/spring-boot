@@ -58,6 +58,25 @@ public class ClassLoaderTests {
 	}
 
 	/**
+	 * AccessibleObject.setAccessible 可以让单例的概念变得不复存在 ...
+	 */
+	@Test
+	public void accesibleTests() throws InvocationTargetException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+		class A {
+			private A() {
+
+			}
+		}
+
+		// 这是一个逃狱方法,让一些对象  可以访问 ..
+		final Constructor<A> declaredConstructor = A.class.getDeclaredConstructor();
+		AccessibleObject.setAccessible(new AccessibleObject[] {declaredConstructor},true);
+		System.out.println(declaredConstructor.isAccessible());
+		final A a = declaredConstructor.newInstance();
+		System.out.println(a);
+	}
+
+	/**
 	 * 文件 难道路径可以直接指定一个 网络地址 ??
 	 */
 	public static class FileTests {
@@ -69,20 +88,8 @@ public class ClassLoaderTests {
 					.exists());
 			// file .
 
-			class A {
-				private A() {
-
-				}
-			}
-
-			// 这是一个逃狱方法,让一些对象  可以访问 ..
-			final Constructor<A> declaredConstructor = A.class.getDeclaredConstructor();
-			AccessibleObject.setAccessible(new AccessibleObject[] {declaredConstructor},true);
-
-
-			System.out.println(declaredConstructor.isAccessible());
-			final A a = declaredConstructor.newInstance();
-			System.out.println(a);
+			File file = new File("http://http://company.generatech.ltd:9090/Packages");
+			System.out.println(file.exists());
 		}
 	}
 

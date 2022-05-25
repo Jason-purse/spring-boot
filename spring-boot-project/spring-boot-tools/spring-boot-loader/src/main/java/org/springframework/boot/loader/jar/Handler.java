@@ -426,6 +426,9 @@ public class Handler extends URLStreamHandler {
 	 * If possible, capture a URL that is configured with the original jar handler so that
 	 * we can use it as a fallback context later. We can only do this if we know that we
 	 * can reset the handlers after.
+	 *
+	 * 如果可能,使用原始jar 处理器捕捉一个URL(配置的URL) - 因此我们能够将它作为一个兜底上下文操作 ..
+	 * 我们只能这样做,如果我们知道我们可以重置后的处理程序。
 	 */
 	static void captureJarContextUrl() {
 		if (canResetCachedUrlHandlers()) {
@@ -433,14 +436,18 @@ public class Handler extends URLStreamHandler {
 			try {
 				System.clearProperty(PROTOCOL_HANDLER);
 				try {
+					// 重置之后
 					resetCachedUrlHandlers();
 					jarContextUrl = new URL("jar:file:context.jar!/");
 					URLConnection connection = jarContextUrl.openConnection();
+					// 如果能够拿到context.jar 并且是jarURLConnection
 					if (connection instanceof JarURLConnection) {
+						// 设置为null
 						jarContextUrl = null;
 					}
 				}
 				catch (Exception ex) {
+					// 正常情况下  我觉得它应该是异常 ...
 				}
 			}
 			finally {
