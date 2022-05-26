@@ -57,9 +57,15 @@ public abstract class Launcher {
 			// 如果处于非分解模式,注册URL 协议处理器 ...
 			JarFile.registerUrlProtocolHandler();
 		}
+
+		// 默认创建的是Launched...loader
 		ClassLoader classLoader = createClassLoader(getClassPathArchivesIterator());
+
+
 		String jarMode = System.getProperty("jarmode");
 		String launchClass = (jarMode != null && !jarMode.isEmpty()) ? JAR_MODE_LAUNCHER : getMainClass();
+
+		// 根据jar模式判断,启用哪一种 ..
 		launch(args, launchClass, classLoader);
 	}
 
@@ -93,6 +99,7 @@ public abstract class Launcher {
 
 	/**
 	 * Create a classloader for the specified URLs.
+	 * 根据给定的Url 创建类路径加载 ....器
 	 * @param urls the URLs
 	 * @return the classloader
 	 * @throws Exception if the classloader cannot be created
@@ -103,13 +110,19 @@ public abstract class Launcher {
 
 	/**
 	 * Launch the application given the archive file and a fully configured classloader.
+	 *
+	 * 启动一个应用 (通过给定的archive 和 完全配置的类加载器)
 	 * @param args the incoming arguments
 	 * @param launchClass the launch class to run
 	 * @param classLoader the classloader
 	 * @throws Exception if the launch fails
 	 */
 	protected void launch(String[] args, String launchClass, ClassLoader classLoader) throws Exception {
+		// 设置了当前线程上下文的类加载器 ...
+		// 那么所有由当前线程派生的线程都应该使用此加载器 ...
 		Thread.currentThread().setContextClassLoader(classLoader);
+
+		// 然后创建 启动器Runner run
 		createMainMethodRunner(launchClass, args, classLoader).run();
 	}
 
@@ -121,6 +134,7 @@ public abstract class Launcher {
 	 * @return the main method runner
 	 */
 	protected MainMethodRunner createMainMethodRunner(String mainClass, String[] args, ClassLoader classLoader) {
+		// 默认是使用MainMethodRunner ...
 		return new MainMethodRunner(mainClass, args);
 	}
 

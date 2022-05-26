@@ -89,13 +89,18 @@ public abstract class ExecutableArchiveLauncher extends Launcher {
 
 	@Override
 	protected ClassLoader createClassLoader(Iterator<Archive> archives) throws Exception {
+		// 猜测类路径长度尺寸 ...
 		List<URL> urls = new ArrayList<>(guessClassPathSize());
 		while (archives.hasNext()) {
+			// 获取对应的Archive url
 			urls.add(archives.next().getUrl());
 		}
+		// 如果classPathIndex 不为空 ...
 		if (this.classPathIndex != null) {
+			// 增加classPathIndex中的urls
 			urls.addAll(this.classPathIndex.getUrls());
 		}
+		// 创建类加载器
 		return createClassLoader(urls.toArray(new URL[0]));
 	}
 

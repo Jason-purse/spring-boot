@@ -26,7 +26,7 @@ import java.util.jar.Manifest;
 
 /**
  * Extended variant of {@link java.util.jar.JarEntry} returned by {@link JarFile}s.
- *
+ * 由 JarFile 返回的JarEntry 扩展变种 ...
  * @author Phillip Webb
  * @author Andy Wilkinson
  */

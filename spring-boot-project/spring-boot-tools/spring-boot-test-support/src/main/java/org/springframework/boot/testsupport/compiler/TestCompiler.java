@@ -33,6 +33,7 @@ import javax.tools.ToolProvider;
 /**
  * Wrapper to make the {@link JavaCompiler} easier to use in tests.
  *
+ * 包装了Java 编译器更好的用于测试 。。
  * @author Stephane Nicoll
  * @author Phillip Webb
  * @author Andy Wilkinson
@@ -61,12 +62,16 @@ public class TestCompiler {
 		this.outputLocation = outputLocation;
 		this.outputLocation.mkdirs();
 		Iterable<? extends File> temp = Collections.singletonList(this.outputLocation);
+		// 设置编译之后的类文件输出
 		this.fileManager.setLocation(StandardLocation.CLASS_OUTPUT, temp);
+		// 设置编译之后的资源输出位置 ..
 		this.fileManager.setLocation(StandardLocation.SOURCE_OUTPUT, temp);
 	}
 
 	public TestCompilationTask getTask(Collection<File> sourceFiles) {
+		// 获取java 文件对象
 		Iterable<? extends JavaFileObject> javaFileObjects = this.fileManager.getJavaFileObjectsFromFiles(sourceFiles);
+		// 创建任务 ...
 		return getTask(javaFileObjects);
 	}
 
@@ -77,7 +82,10 @@ public class TestCompiler {
 
 	private TestCompilationTask getTask(Iterable<? extends JavaFileObject> javaFileObjects) {
 		return new TestCompilationTask(
-				this.compiler.getTask(null, this.fileManager, null, null, null, javaFileObjects));
+				// 通过编译器创建任务 ...
+				// 这里的classes 被用来进行 注解处理的类 ...
+				this.compiler.getTask(null, this.fileManager, null, null, null, javaFileObjects)
+		);
 	}
 
 	public File getOutputLocation() {
@@ -109,14 +117,20 @@ public class TestCompiler {
 	 */
 	public static class TestCompilationTask {
 
+		/**
+		 * 编译任务 ...
+		 */
 		private final CompilationTask task;
 
 		public TestCompilationTask(CompilationTask task) {
 			this.task = task;
 		}
 
+		// 注解处理器接口 ...
 		public void call(Processor... processors) {
+			// 可以设置注解处理器
 			this.task.setProcessors(Arrays.asList(processors));
+			// 编译失败,抛出异常 ..
 			if (!this.task.call()) {
 				throw new IllegalStateException("Compilation failed");
 			}

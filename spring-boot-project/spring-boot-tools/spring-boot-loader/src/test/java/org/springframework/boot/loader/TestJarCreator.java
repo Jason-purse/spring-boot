@@ -29,7 +29,7 @@ import java.util.zip.ZipEntry;
 
 /**
  * Creates a simple test jar.
- *
+ * 创建一个简单的测试jar ...
  * @author Phillip Webb
  */
 public abstract class TestJarCreator {
@@ -54,9 +54,17 @@ public abstract class TestJarCreator {
 		createTestJar(file, false);
 	}
 
+	/**
+	 * 根据是否解压内部资源 创建一个测试jar
+	 * @param file 需要创建jar 的文件 ...
+	 * @param unpackNested 是否需要解压内嵌资源 ...
+	 * @throws Exception
+	 */
 	public static void createTestJar(File file, boolean unpackNested) throws Exception {
 		FileOutputStream fileOutputStream = new FileOutputStream(file);
+		// 根据文件流  创建一个Jar 输出流 ...
 		try (JarOutputStream jarOutputStream = new JarOutputStream(fileOutputStream)) {
+			// 设置注释 ..
 			jarOutputStream.setComment("outer");
 			writeManifest(jarOutputStream, "j1");
 			writeEntry(jarOutputStream, "1.dat", 1);
@@ -65,6 +73,7 @@ public abstract class TestJarCreator {
 			writeEntry(jarOutputStream, "d/9.dat", 9);
 			writeDirEntry(jarOutputStream, "special/");
 			writeEntry(jarOutputStream, "special/\u00EB.dat", '\u00EB');
+			// 写入一个内嵌的Jar ...
 			writeNestedEntry("nested.jar", unpackNested, jarOutputStream);
 			writeNestedEntry("another-nested.jar", unpackNested, jarOutputStream);
 			writeNestedEntry("space nested.jar", unpackNested, jarOutputStream);
@@ -100,6 +109,7 @@ public abstract class TestJarCreator {
 		jarOutputStream.closeEntry();
 	}
 
+	// 随意写一点jar 数据 ...
 	private static byte[] getNestedJarData(boolean multiRelease) throws Exception {
 		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		JarOutputStream jarOutputStream = new JarOutputStream(byteArrayOutputStream);
@@ -129,6 +139,7 @@ public abstract class TestJarCreator {
 		Manifest manifest = new Manifest();
 		manifest.getMainAttributes().putValue("Built-By", name);
 		manifest.getMainAttributes().put(Attributes.Name.MANIFEST_VERSION, "1.0");
+		// ??? 多发行版 ... 这什么意思
 		if (multiRelease) {
 			manifest.getMainAttributes().putValue("Multi-Release", Boolean.toString(true));
 		}

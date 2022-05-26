@@ -58,6 +58,31 @@ public class ClassLoaderTests {
 	}
 
 	/**
+	 * launch loader tests
+	 *
+	 * 它的作用就是  将加载类的URL(CodeSource) 重定义了
+	 * 借助 URLClassPath 寻找对应的应用类class
+	 *
+	 * 并且它重定义了一个 为exploded package jar 支持的定义包的机制
+	 * //从获取Manifest 文件作为入口  形成调用链 -> 回到父类加载器的对应方法执行 定义包 ->  然后执行正式的定义包形式 -> 最后 Package(new)
+	 */
+	@Test
+	public void LaunchLoaderTests() {
+		// 所以这样依赖,我们的应用类 能够通过LaunchClassLoader 加载 ..
+		// 但是还有一个问题,内嵌Jar的文件如何加载呢 ...
+	}
+
+	@Test
+	public void nestJarTests() {
+
+
+	}
+
+
+
+
+
+	/**
 	 * AccessibleObject.setAccessible 可以让单例的概念变得不复存在 ...
 	 */
 	@Test

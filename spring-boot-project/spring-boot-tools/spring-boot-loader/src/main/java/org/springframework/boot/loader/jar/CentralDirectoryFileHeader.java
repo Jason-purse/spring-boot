@@ -77,7 +77,7 @@ final class CentralDirectoryFileHeader implements FileHeader {
 	 * @param data zip 数据内容
 	 * @param dataOffset 数据偏距
 	 * @param variableData 额外字段数据信息
-	 * @param variableOffset 额外字段数据 偏距
+	 * @param variableOffset zip 中央目录头 偏距
 	 * @param filter 过滤器 ...
 	 * @throws IOException
 	 */

@@ -67,18 +67,25 @@ public abstract class AbstractExecutableArchiveLauncherTests {
 	protected File createJarArchive(String name, Manifest manifest, String entryPrefix, boolean indexed,
 			List<String> extraLibs) throws IOException {
 		File archive = new File(this.tempDir, name);
+
+		// 通过jar 输出流  输出信息 ...
 		JarOutputStream jarOutputStream = new JarOutputStream(new FileOutputStream(archive));
 		if (manifest != null) {
 			jarOutputStream.putNextEntry(new JarEntry("META-INF/"));
 			jarOutputStream.putNextEntry(new JarEntry("META-INF/MANIFEST.MF"));
+			// 将清单写入 流中 ...
 			manifest.write(jarOutputStream);
 			jarOutputStream.closeEntry();
 		}
 		jarOutputStream.putNextEntry(new JarEntry(entryPrefix + "/"));
 		jarOutputStream.putNextEntry(new JarEntry(entryPrefix + "/classes/"));
 		jarOutputStream.putNextEntry(new JarEntry(entryPrefix + "/lib/"));
+
+		// 是否应该索引,如果是 ... 加入这几个 索引条目 ...
 		if (indexed) {
+			// 默认应该是会打开这个Entry 进行处理的 ..
 			jarOutputStream.putNextEntry(new JarEntry(entryPrefix + "/classpath.idx"));
+			// 输出流写入器 ..
 			Writer writer = new OutputStreamWriter(jarOutputStream, StandardCharsets.UTF_8);
 			writer.write("- \"BOOT-INF/lib/foo.jar\"\n");
 			writer.write("- \"BOOT-INF/lib/bar.jar\"\n");
@@ -86,10 +93,14 @@ public abstract class AbstractExecutableArchiveLauncherTests {
 			writer.flush();
 			jarOutputStream.closeEntry();
 		}
+		// 给 foo.jar 增加内嵌Jar ...
 		addNestedJars(entryPrefix, "/lib/foo.jar", jarOutputStream);
 		addNestedJars(entryPrefix, "/lib/bar.jar", jarOutputStream);
 		addNestedJars(entryPrefix, "/lib/baz.jar", jarOutputStream);
+
+		// 增加内嵌的Jar
 		for (String lib : extraLibs) {
+			// f-each ... 增加到lib中 ...
 			addNestedJars(entryPrefix, "/lib/" + lib, jarOutputStream);
 		}
 		jarOutputStream.close();
@@ -98,17 +109,29 @@ public abstract class AbstractExecutableArchiveLauncherTests {
 
 	private void addNestedJars(String entryPrefix, String lib, JarOutputStream jarOutputStream) throws IOException {
 		JarEntry libFoo = new JarEntry(entryPrefix + lib);
+		// 内部这个jar 不能被压缩(只能被存储) 所以方式为0
 		libFoo.setMethod(ZipEntry.STORED);
+		// 字节数组输出流
 		ByteArrayOutputStream fooJarStream = new ByteArrayOutputStream();
+		//
 		new JarOutputStream(fooJarStream).close();
+		// 设置尺寸 ..
 		libFoo.setSize(fooJarStream.size());
+		// 使用CRC 32 保证数据正确性 ...
 		CRC32 crc32 = new CRC32();
+		// 校验 ..
 		crc32.update(fooJarStream.toByteArray());
+		// 设置crc ...
 		libFoo.setCrc(crc32.getValue());
+		// 设置libFoo
 		jarOutputStream.putNextEntry(libFoo);
+
+		// 写入数据 .. 这个Entry 的内容 ...
 		jarOutputStream.write(fooJarStream.toByteArray());
 	}
 
+
+	// 游离
 	protected File explode(File archive) throws IOException {
 		File exploded = new File(this.tempDir, "exploded");
 		exploded.mkdirs();
