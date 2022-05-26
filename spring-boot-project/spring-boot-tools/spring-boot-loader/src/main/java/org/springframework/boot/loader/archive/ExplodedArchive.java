@@ -36,6 +36,7 @@ import java.util.jar.Manifest;
 /**
  * {@link Archive} implementation backed by an exploded archive directory.
  *
+ * 由分离的文档目录支持的Archive ..
  * @author Phillip Webb
  * @author Andy Wilkinson
  * @author Madhura Bhave
@@ -64,7 +65,7 @@ public class ExplodedArchive implements Archive {
 	/**
 	 * Create a new {@link ExplodedArchive} instance.
 	 * @param root the root directory
-	 * @param recursive if recursive searching should be used to locate the manifest.
+	 * @param recursive if recursive searching should be used to locate the manifest.  递归查找  查找manifest ...
 	 * Defaults to {@code true}, directories with a large tree might want to set this to
 	 * {@code false}.
 	 */

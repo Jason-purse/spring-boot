@@ -16,6 +16,7 @@ repositories {
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testImplementation(project(":spring-boot-project:spring-boot-tools:spring-boot-loader"))
 }
 
 test {
@@ -23,6 +24,8 @@ test {
 }
 
 tasks.named("compileJava") {
+    options.compilerArgs = ['-Xlint:unchecked']
+
     // Try to turn them all off automatically
     options.compilerArgs << '-Xlint:none'
     options.compilerArgs << '-nowarn' // same as '-Xlint:none'
@@ -49,6 +52,41 @@ tasks.named("compileJava") {
     options.compilerArgs << '-Xlint:-unchecked'
     options.compilerArgs << '-Xlint:-varargs'
     options.compilerArgs << '-XDignore.symbol.file'
+    options.fork = true // may not needed on 1.8
+    options.forkOptions.executable = 'javac' // may not needed on 1.8
+}
+
+tasks.named("compileTestJava") {
+    options.compilerArgs = ['-Xlint:unchecked']
+
+    // Try to turn them all off automatically
+    options.compilerArgs << '-Xlint:none'
+    options.compilerArgs << '-nowarn' // same as '-Xlint:none'
+
+    // Turn them off manually
+    options.compilerArgs << '-Xlint:-auxiliaryclass'
+    options.compilerArgs << '-Xlint:-cast'
+    options.compilerArgs << '-Xlint:-classfile'
+    options.compilerArgs << '-Xlint:-deprecation'
+    options.compilerArgs << '-Xlint:-dep-ann'
+    options.compilerArgs << '-Xlint:-divzero'
+    options.compilerArgs << '-Xlint:-empty'
+    options.compilerArgs << '-Xlint:-fallthrough'
+    options.compilerArgs << '-Xlint:-finally'
+    options.compilerArgs << '-Xlint:-options'
+    options.compilerArgs << '-Xlint:-overloads'
+    options.compilerArgs << '-Xlint:-overrides'
+    options.compilerArgs << '-Xlint:-path'
+    options.compilerArgs << '-Xlint:-processing'
+    options.compilerArgs << '-Xlint:-rawtypes'
+    options.compilerArgs << '-Xlint:-serial'
+    options.compilerArgs << '-Xlint:-static'
+    options.compilerArgs << '-Xlint:-try'
+    options.compilerArgs << '-Xlint:-unchecked'
+    options.compilerArgs << '-Xlint:-varargs'
+    options.compilerArgs << '-XDignore.symbol.file'
+    options.fork = true // may not needed on 1.8
+    options.forkOptions.executable = 'javac' // may not needed on 1.8
 }
 
 

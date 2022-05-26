@@ -50,6 +50,7 @@ public class LaunchedURLClassLoader extends URLClassLoader {
 	private static final int BUFFER_SIZE = 4096;
 
 	static {
+		// 尽可能并行注册类加载器 .. (这里的caller 是ClassLoader)
 		ClassLoader.registerAsParallelCapable();
 	}
 
@@ -87,7 +88,7 @@ public class LaunchedURLClassLoader extends URLClassLoader {
 	 * @param exploded if the underlying archive is exploded
 	 * @param rootArchive the root archive or {@code null}  最外层的 归档文件或者null ..
 	 * @param urls the URLs from which to load classes and resources  加载classes 和 resources 的URL ...
-	 * @param parent the parent class loader for delegation
+	 * @param parent the parent class loader for delegation 父类加载器 ..(加载这个类的类加载器 应该就是AppClassLoader )
 	 * @since 2.3.1
 	 */
 	public LaunchedURLClassLoader(boolean exploded, Archive rootArchive, URL[] urls, ClassLoader parent) {
@@ -96,13 +97,17 @@ public class LaunchedURLClassLoader extends URLClassLoader {
 		this.rootArchive = rootArchive;
 	}
 
+	// 决定了如何发现资源 ...
 	@Override
 	public URL findResource(String name) {
+		// 如果是目录  直接常规解析方式即可 ...
 		if (this.exploded) {
 			return super.findResource(name);
 		}
+		// 但是jar中 需要使用协议处理 ...
 		Handler.setUseFastConnectionExceptions(true);
 		try {
+			// 也是基于 URLClassPath 查找资源 ...
 			return super.findResource(name);
 		}
 		finally {
@@ -163,7 +168,7 @@ public class LaunchedURLClassLoader extends URLClassLoader {
 			}
 		}
 
-		// 如果是暴露的 ...
+		// 如果是暴露,游离的 ...
 		if (this.exploded) {
 			// 尝试父类加载器加载类 ...
 			// 仅仅外部jar才允许这种加载方式 .. 否则无法找到resource ...
@@ -331,16 +336,16 @@ public class LaunchedURLClassLoader extends URLClassLoader {
 	protected Package definePackage(String name, Manifest man, URL url) throws IllegalArgumentException {
 
 		// 所以需要 搞清楚 explode 到底干了什么
-		// 相当于一个内嵌的jar才需要定义包 ...
+		// 相当于 游离的包(也就是目录文件) ...
 		if (!this.exploded) {
 			// 包名 这里的manifest 用来读取版本和密闭信息
-			// 对于一个密闭包,这些url 制定了code source(代码来源),此类或者资源从哪里加载 ...
+			// 对于一个游离的包,这些url 制定了code source(代码来源),此类或者资源从哪里加载 ...
 			return super.definePackage(name, man, url);
 		}
 		// 否则外暴露的包 需要制定manifest ...
 		// 这里的加载类 并行的 ..(猜测)
 		// 所以加锁 ...
-		synchronized (this.packageLock) {
+		synchronized (this.packageLock) { // 这里加载类并不是为了并行的,是为了维持调用链, 否则进入查询manifest  定义包的循环...
 			return doDefinePackage(DefinePackageCallType.MANIFEST, () -> super.definePackage(name, man, url));
 		}
 	}
@@ -348,7 +353,7 @@ public class LaunchedURLClassLoader extends URLClassLoader {
 	@Override
 	protected Package definePackage(String name, String specTitle, String specVersion, String specVendor,
 			String implTitle, String implVersion, String implVendor, URL sealBase) throws IllegalArgumentException {
-		if (!this.exploded) {
+		if (!this.exploded) { // 非游离的包 java 定义包信息 ...
 			return super.definePackage(name, specTitle, specVersion, specVendor, implTitle, implVersion, implVendor,
 					sealBase);
 		}
@@ -366,9 +371,9 @@ public class LaunchedURLClassLoader extends URLClassLoader {
 				// 我们不是调用链的一部分 - 这意味着URLClassLoader 尝试为我们暴露的JAR 定义一个包 ..
 				// 我们使用这个manifest 版本确保包的属性被设置
 				Manifest manifest = getManifest(this.rootArchive);
-				// 如果清单不为空 ...
+				// 如果清单不为空 ..., 这里为什么定义清单信息呢,因为父类已经找不到这些类了,并且它还没有清单信息,我们给它指定清单信息,然后尝试从中查询  应用代码,这是最后的机会,双亲委派已经任务完成 ...
 				if (manifest != null) {
-
+					// 从这里开始进入调用链...
 					// 这里清单不为空,重新定义一次(处于让它开始调用链)
 					return definePackage(name, manifest, sealBase);
 				}

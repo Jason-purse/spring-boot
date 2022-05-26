@@ -433,6 +433,8 @@ class JarFileEntries implements CentralDirectoryVisitor, Iterable<JarEntry> {
 			}
 			int entryIndex = JarFileEntries.this.positions[this.index];
 			this.index++;
+
+			// 获取entry
 			return getEntry(entryIndex, JarEntry.class, false, null);
 		}
 

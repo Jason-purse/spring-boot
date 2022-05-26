@@ -46,17 +46,32 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class JarLauncherTests extends AbstractExecutableArchiveLauncherTests {
 
+
+	/**
+	 * 游离的Jar(只有Boot-Inf / classes / 以及 lib
+	 * @throws Exception
+	 */
 	@Test
 	void explodedJarHasOnlyBootInfClassesAndContentsOfBootInfLibOnClasspath() throws Exception {
+		// 解压 ...
 		File explodedRoot = explode(createJarArchive("archive.jar", "BOOT-INF"));
+		// 创建一个JarLauncher ...
 		JarLauncher launcher = new JarLauncher(new ExplodedArchive(explodedRoot, true));
 		List<Archive> archives = new ArrayList<>();
+		// 获取类路径上的nest Archives...
+		// 深度遍历优先算法 .. 如果没有一个entry 没有东西,那么它本身会打印出来,否则打印它的子内容 ...
 		launcher.getClassPathArchivesIterator().forEachRemaining(archives::add);
 		assertThat(getUrls(archives)).containsExactlyInAnyOrder(getExpectedFileUrls(explodedRoot));
+		System.out.println("----------------- archives --------------------------");
+		char i = 0;
 		for (Archive archive : archives) {
+			System.out.printf("archive %s%sn", archive.getUrl(),((byte) i++));
 			archive.close();
 		}
 	}
+
+
+
 
 	@Test
 	void archivedJarHasOnlyBootInfClassesAndContentsOfBootInfLibOnClasspath() throws Exception {
@@ -80,16 +95,19 @@ class JarLauncherTests extends AbstractExecutableArchiveLauncherTests {
 	@Test
 	void explodedJarShouldPreserveClasspathOrderWhenIndexPresent() throws Exception {
 		File explodedRoot = explode(createJarArchive("archive.jar", "BOOT-INF", true, Collections.emptyList()));
+		//File explodedRoot = explode(createJarArchive("archive.jar", "BOOT-INF", true, Arrays.asList("123.jar","456.jar")));
 		JarLauncher launcher = new JarLauncher(new ExplodedArchive(explodedRoot, true));
 		Iterator<Archive> archives = launcher.getClassPathArchivesIterator();
 		URLClassLoader classLoader = (URLClassLoader) launcher.createClassLoader(archives);
 		URL[] urls = classLoader.getURLs();
+		System.out.println(Arrays.toString(urls));
 		assertThat(urls).containsExactly(getExpectedFileUrls(explodedRoot));
 	}
 
 	@Test
 	void jarFilesPresentInBootInfLibsAndNotInClasspathIndexShouldBeAddedAfterBootInfClasses() throws Exception {
 		ArrayList<String> extraLibs = new ArrayList<>(Arrays.asList("extra-1.jar", "extra-2.jar"));
+		// 将它追加到对应的目录中 ...
 		File explodedRoot = explode(createJarArchive("archive.jar", "BOOT-INF", true, extraLibs));
 		JarLauncher launcher = new JarLauncher(new ExplodedArchive(explodedRoot, true));
 		Iterator<Archive> archives = launcher.getClassPathArchivesIterator();
@@ -102,21 +120,29 @@ class JarLauncherTests extends AbstractExecutableArchiveLauncherTests {
 
 	@Test
 	void explodedJarDefinedPackagesIncludeManifestAttributes() throws Exception {
+
+		// 设置清单属性 ...
+
 		Manifest manifest = new Manifest();
 		Attributes attributes = manifest.getMainAttributes();
 		attributes.put(Name.MANIFEST_VERSION, "1.0");
 		attributes.put(Name.IMPLEMENTATION_TITLE, "test");
 		File explodedRoot = explode(
 				createJarArchive("archive.jar", manifest, "BOOT-INF", true, Collections.emptyList()));
+		// 测试编译器, 直接编译  制定了类文件输出位置  ....
 		TestCompiler compiler = new TestCompiler(new File(explodedRoot, "BOOT-INF/classes"));
+		// 指定了临时目录下面的 对应类
 		File source = new File(this.tempDir, "explodedsample/ExampleClass.java");
 		source.getParentFile().mkdirs();
+		// 然后copy
 		FileCopyUtils.copy(new File("src/test/resources/explodedsample/ExampleClass.txt"), source);
+		// 进行编译 调用 ...
 		compiler.getTask(Collections.singleton(source)).call();
+
 		JarLauncher launcher = new JarLauncher(new ExplodedArchive(explodedRoot, true));
 		Iterator<Archive> archives = launcher.getClassPathArchivesIterator();
 		URLClassLoader classLoader = (URLClassLoader) launcher.createClassLoader(archives);
-		Class<?> loaded = classLoader.loadClass("explodedsample.ExampleClass");
+		Class<?> loaded = classLoader.loadClass("explodedsample.ExampleClass");  // 可以看出来 通过URLClassLoader 我们可以根据指定的URLPath路径下查找这些类 ....
 		assertThat(loaded.getPackage().getImplementationTitle()).isEqualTo("test");
 	}
 
