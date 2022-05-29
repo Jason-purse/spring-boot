@@ -133,6 +133,11 @@ class LaunchedURLClassLoaderTests {
 
 	}
 
+	/**
+	 * 这里为什么能继续执行 ..
+	 * 因为线程中断  仅仅只是设置中断状态,所以 如果没有 ...线程响应这个中断状态, 那么可以继续处理(就像密集型处理)
+	 * @throws Exception
+	 */
 	@Test
 	void resolveFromNestedWhileThreadIsInterrupted() throws Exception {
 		File file = new File(this.tempDir, "test.jar");
@@ -141,6 +146,8 @@ class LaunchedURLClassLoaderTests {
 			URL url = jarFile.getUrl();
 			try (LaunchedURLClassLoader loader = new LaunchedURLClassLoader(new URL[] { url }, null)) {
 				Thread.currentThread().interrupt();
+				System.out.println("current thread is " + Thread.currentThread().getName());
+				System.out.println("only set interrupted to " + Thread.currentThread().isInterrupted());
 				URL resource = loader.getResource("nested.jar!/3.dat");
 				assertThat(resource.toString()).isEqualTo(url + "nested.jar!/3.dat");
 				URLConnection connection = resource.openConnection();

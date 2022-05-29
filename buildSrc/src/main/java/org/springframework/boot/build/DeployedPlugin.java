@@ -27,12 +27,13 @@ import org.gradle.api.tasks.bundling.Jar;
 
 /**
  * A plugin applied to a project that should be deployed.
- *
+ * 一个应用到应该部署的项目的插件 ...
  * @author Andy Wilkinson
  */
 public class DeployedPlugin implements Plugin<Project> {
 
 	/**
+	 * 生成POM 文件的任务名称 ...
 	 * Name of the task that generates the deployed pom file.
 	 */
 	public static final String GENERATE_POM_TASK_NAME = "generatePomFileForMavenPublication";
