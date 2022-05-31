@@ -105,7 +105,7 @@ class JavaConventions {
 	void apply(Project project) {
 		project.getPlugins().withType(JavaBasePlugin.class, (java) -> {
 			project.getPlugins().apply(TestFailuresPlugin.class);
-			configureSpringJavaFormat(project);
+			//configureSpringJavaFormat(project);
 			configureJavaConventions(project);
 			configureJavadocConventions(project);
 			configureTestConventions(project);
@@ -194,7 +194,9 @@ class JavaConventions {
 				compile.setTargetCompatibility(SOURCE_AND_TARGET_COMPATIBILITY);
 			}
 			else if (buildingWithJava8(project)) {
-				args.addAll(Arrays.asList("-Werror", "-Xlint:unchecked", "-Xlint:deprecation", "-Xlint:rawtypes",
+				// 取消 -Werror
+				//"-Werror",
+				args.addAll(Arrays.asList( "-Xlint:unchecked", "-Xlint:deprecation", "-Xlint:rawtypes",
 						"-Xlint:varargs"));
 			}
 		});
@@ -213,8 +215,9 @@ class JavaConventions {
 		checkstyle.getConfigDirectory().set(project.getRootProject().file("src/checkstyle"));
 		String version = SpringJavaFormatPlugin.class.getPackage().getImplementationVersion();
 		DependencySet checkstyleDependencies = project.getConfigurations().getByName("checkstyle").getDependencies();
-		checkstyleDependencies
-				.add(project.getDependencies().create("io.spring.javaformat:spring-javaformat-checkstyle:" + version));
+		// 不适用spring.javaformat
+		//checkstyleDependencies
+		//		.add(project.getDependencies().create("io.spring.javaformat:spring-javaformat-checkstyle:" + version));
 	}
 
 	private void configureDependencyManagement(Project project) {

@@ -24,16 +24,15 @@ import org.gradle.api.publish.PublishingExtension;
 import org.gradle.api.publish.maven.MavenPublication;
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin;
 import org.gradle.api.tasks.bundling.Jar;
+import org.springframework.boot.build.MavenRepositoryPlugin;
 
 /**
  * A plugin applied to a project that should be deployed.
- * 一个应用到应该部署的项目的插件 ...
  * @author Andy Wilkinson
  */
 public class DeployedPlugin implements Plugin<Project> {
 
 	/**
-	 * 生成POM 文件的任务名称 ...
 	 * Name of the task that generates the deployed pom file.
 	 */
 	public static final String GENERATE_POM_TASK_NAME = "generatePomFileForMavenPublication";
@@ -42,6 +41,7 @@ public class DeployedPlugin implements Plugin<Project> {
 	public void apply(Project project) {
 		project.getPlugins().apply(MavenPublishPlugin.class);
 		project.getPlugins().apply(MavenRepositoryPlugin.class);
+
 		PublishingExtension publishing = project.getExtensions().getByType(PublishingExtension.class);
 		MavenPublication mavenPublication = publishing.getPublications().create("maven", MavenPublication.class);
 		project.afterEvaluate((evaluated) -> {

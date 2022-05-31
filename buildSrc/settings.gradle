@@ -3,7 +3,10 @@ pluginManagement {
 		mavenCentral()
 		gradlePluginPortal()
 	}
+
+	// 指定解析策略 ..
 	resolutionStrategy {
+		// 强制javaformat 使用指定的格式..
 		eachPlugin {
 			if (requested.id.id == "io.spring.javaformat") {
 				useModule "io.spring.javaformat:spring-javaformat-gradle-plugin:${requested.version}"

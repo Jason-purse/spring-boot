@@ -69,8 +69,11 @@ sourceSets {
 	}
 }
 
+// 指定编译Java 任务
 compileJava {
+	// 如果当前项目没有配置工具链版本 并且 Java 版本为 1.8
 	if ((!project.hasProperty("toolchainVersion")) && JavaVersion.current() == JavaVersion.VERSION_1_8) {
+		//
 		options.compilerArgs += ['-Xlint:-sunapi', '-XDenableSunApiLintControl']	
 	}	
 }
