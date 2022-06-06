@@ -1,3 +1,4 @@
+// 参考 https://www.yuque.com/gaolengdehulusi/nggog2/dyn3kp#MPm02
 pluginManagement {
 	repositories {
 		mavenLocal()
@@ -8,6 +9,8 @@ pluginManagement {
 		maven {
 			url 'https://repo.spring.io/release'
 		}
+
+		// 如果当前项目的版本
 		if (version.endsWith('-SNAPSHOT')) {
 			maven { url "https://repo.spring.io/snapshot" }
 		}

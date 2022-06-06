@@ -1,3 +1,5 @@
+// 根据Project 类型的描述,它可以直接在Project 对象上增加一个插件 , 或者使用  PluginDependenciesSpec 脚本块
+//https://www.yuque.com/gaolengdehulusi/nggog2/btuabt#ngYwh
 plugins {
 	id "org.jetbrains.kotlin.jvm" apply false // https://youtrack.jetbrains.com/issue/KT-30276
 //	id "io.spring.nohttp" version "0.0.10"
