@@ -94,12 +94,15 @@ public class URLTests {
 
 
 		Resource resource = urlClassPath.getResource("explodedsample/ExampleClass.class");
+
+
+
+
 		// 关闭这些加载器,否则无法正常删除文件
 		urlClassPath.closeLoaders();
 		assert resource != null : "resource 不应该为空";
 
 		System.out.println(String.format("printf resource %s", resource.getURL()));
-
 
 	}
 }

@@ -18,10 +18,7 @@ package org.springframework.boot.loader;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.JarURLConnection;
-import java.net.URI;
-import java.net.URL;
-import java.net.URLConnection;
+import java.net.*;
 import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -34,6 +31,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.springframework.boot.loader.archive.Archive;
 import org.springframework.boot.loader.archive.JarFileArchive;
 import org.springframework.boot.loader.jar.JarFile;
+import sun.misc.URLClassPath;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -115,19 +113,41 @@ class LaunchedURLClassLoaderTests {
 				try (InputStream input = resource.openConnection().getInputStream()) {
 					assertThat(input.read()).isEqualTo(3);
 				}
-				URL resource1 = loader.getResource("./");
+				URL resource1 = loader.getResource("");
 				if(resource1 != null) {
 					File file1 = new File(loader.getResource("").toURI());
 					JarFile jarEntries = new JarFile(file1);
 					System.out.println(jarEntries.getEntry("nested.jar"));
 				}
 				else {
+
+
+					// 这里为什么是空,是因为  它不在拥有 父亲加载的其中一个 resource,所以没有 ...
+					// 它的加载流程是  如果有父类加载器 会执行父类加载器的方法
+					// 否则 交给虚拟机查找内部的资源,否则  执行当前类加载器的方法 .. getResource
+
+					// 对于这个类加载器来说,内部使用URLClassPath 进行处理 ...
 					System.out.println("全是空");
 				}
+
+
+				// 尝试使用URLClassPath 测试 ...
+
+				// 对于普通file前缀开头的path 能够获取其中一个resource 作为根路径 ..but jar 可能无法处理...
+				// 因为在Jar中需要通过指定Entry 查找资源,所以这里找到的resource 为 null ..
+				final URLClassPath urlClassPath = new URLClassPath(
+						new URL[]{
+								url
+						}
+				);
+
+				// 能够找到一个Resource 但是是一个匿名类
+				// 所以我们在不同的实现中完全可以封闭我们的实现,只给出抽象 ...
+
+				System.out.println("jar any \"\" resource: " + urlClassPath.getResource("1.dat").getName());
 			}
 		}
 
-		// 处理
 
 
 

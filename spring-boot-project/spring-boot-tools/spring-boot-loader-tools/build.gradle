@@ -35,6 +35,7 @@ dependencies {
 	testImplementation("org.zeroturnaround:zt-zip:1.13")
 }
 
+
 task reproducibleLoaderJar(type: Jar) {
 	dependsOn configurations.loader
 	from {
