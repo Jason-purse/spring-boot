@@ -43,6 +43,8 @@ public class DeployedPlugin implements Plugin<Project> {
 		project.getPlugins().apply(MavenRepositoryPlugin.class);
 
 		PublishingExtension publishing = project.getExtensions().getByType(PublishingExtension.class);
+
+		// 创建一个 maven Publication
 		MavenPublication mavenPublication = publishing.getPublications().create("maven", MavenPublication.class);
 		project.afterEvaluate((evaluated) -> {
 			project.getPlugins().withType(JavaPlugin.class).all((javaPlugin) -> {

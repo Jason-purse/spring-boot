@@ -31,6 +31,7 @@ import org.gradle.tooling.events.OperationCompletionListener;
 /**
  * {@link BuildService} that provides an overview of all of the test failures in the
  * build.
+ * 提供了此构建中所有测试失败的概述 ..的一个构建服务 ...
  *
  * @author Andy Wilkinson
  */
@@ -42,9 +43,16 @@ public abstract class TestResultsOverview
 
 	private final Object monitor = new Object();
 
+	/**
+	 * 针对指定的测试任务 增加测试失败的描述符 ...
+	 * 并在此服务关闭的时候 打印测试结果概述 ....
+	 * @param test
+	 * @param failureDescriptors
+	 */
 	void addFailures(Test test, List<TestDescriptor> failureDescriptors) {
 		List<TestFailure> testFailures = failureDescriptors.stream().map(TestFailure::new).sorted()
 				.collect(Collectors.toList());
+		// 用锁处理 ..
 		synchronized (this.monitor) {
 			this.testFailures.put(test, testFailures);
 		}
@@ -53,8 +61,12 @@ public abstract class TestResultsOverview
 	@Override
 	public void onFinish(FinishEvent event) {
 		// OperationCompletionListener is implemented to defer close until the build ends
+//		实现操作完成监听器,是为了延后关闭 直到构建结束 ...
 	}
 
+	/**
+	 * close 打印出错误 ...
+	 */
 	@Override
 	public void close() {
 		synchronized (this.monitor) {
