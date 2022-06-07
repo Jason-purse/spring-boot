@@ -10,14 +10,20 @@ pluginManagement {
 			url 'https://repo.spring.io/release'
 		}
 
-		// 如果当前项目的版本
+		// 如果当前项目的版本(查看gradle.properties 了解详情) ...
 		if (version.endsWith('-SNAPSHOT')) {
 			maven { url "https://repo.spring.io/snapshot" }
 		}
 	}
+
+	// 设定解析策略 ...
 	resolutionStrategy {
 		eachPlugin {
+
+			// 根据它已经具有的插件请求(也可以说是原始的插件请求)
+			// 如果是 id是 命名空间为 org.jetbrains.kotlin的 jvm插件 ...
 			if (requested.id.id == "org.jetbrains.kotlin.jvm") {
+				// 指定版本为
 				useVersion "${kotlinVersion}"
 			}
 			if (requested.id.id == "org.jetbrains.kotlin.plugin.spring") {
@@ -27,12 +33,24 @@ pluginManagement {
 	}
 }
 
+//https://www.yuque.com/gaolengdehulusi/nggog2/dyn3kp#JEtNS
 plugins {
+	// 那么在这里使用的插件,并不是使用 ...
+	// 我们应该可以在对应的构建脚本中发现没有携带版本的 插件在plugins中声明 ...并使用 ...
 	id "com.gradle.enterprise" version "3.6.1"
 //	id "io.spring.ge.conventions" version "0.0.8"
 }
 
+// 整个构建中 这个根项目的名称是 ..
 rootProject.name="spring-boot-build"
+
+// 这里为了指明,而不是project.gradle .. 那么我认为这里可能拿不到project了 ???
+// 我们尝试在这里加入一个脚本插件 ...
+
+// https://www.yuque.com/gaolengdehulusi/nggog2/dyn3kp#gnpSg
+// 这里使用遗留的应用脚本插件的方式进行 脚本使用 ...
+apply from: 'gradle/settingProjectCheck.gradle'
+
 
 settings.gradle.projectsLoaded {
 	gradleEnterprise {

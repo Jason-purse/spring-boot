@@ -1,0 +1,16 @@
+// 应该在Settings 中是没有project的 ..
+
+//print "settings file no ${hasProperty("project")}"
+
+// 将会报错 ..
+//print project == getRootProject()
+
+// 判断settings的根项目的gradle 是否等价于 settings本身的gradle 属性,应该是一样的,gradle 表示全局的 当前构建的一次执行 ...
+// 想法挺好,现在还没有使用Settings 配置并创建项目,所以以下语句无法执行
+//print settings.gradle == getRootProject().getGradle()
+
+
+// 详细的构建声明周期 参考 .. https://docs.gradle.org/current/userguide/build_lifecycle.html
+// 通过include ... / includeBuild 开始创建并配置项目,将会返回可用的项目描述符 ...但是此时位于 setting 脚本阶段 ...
+
+print "应用了一个脚本插件\n"
