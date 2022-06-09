@@ -2,6 +2,8 @@
 pluginManagement {
 	repositories {
 		mavenLocal()
+
+		// 同样尝试从 阿里云 maven 仓库中获取 ...
 		maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
 		maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
 		mavenCentral()
@@ -36,8 +38,9 @@ pluginManagement {
 //https://www.yuque.com/gaolengdehulusi/nggog2/dyn3kp#JEtNS
 plugins {
 	// 那么在这里使用的插件,并不是使用 ...
-	// 我们应该可以在对应的构建脚本中发现没有携带版本的 插件在plugins中声明 ...并使用 ...
-	id "com.gradle.enterprise" version "3.6.1"
+	// 我们应该可以在对应的构建脚本中发现没有携带版本的 插件在plugins中声明  ...
+	// 默认来说,这里并没有被应用 ...(apply调用参数 默认是false)
+	id "com.gradle.enterprise" version "3.6.1" apply true
 //	id "io.spring.ge.conventions" version "0.0.8"
 }
 
@@ -51,9 +54,14 @@ rootProject.name="spring-boot-build"
 // 这里使用遗留的应用脚本插件的方式进行 脚本使用 ...
 apply from: 'gradle/settingProjectCheck.gradle'
 
+// 通过Gradle 对象设置事件回调 ..
+// 项目已经被配置,但是还没有被评估
 
+// 构建扫描不关心 ...
 settings.gradle.projectsLoaded {
+	// 项目加载了,这里配置 gradle 构建扫描扩展脚本块 ...
 	gradleEnterprise {
+		// 配置构建扫描 ....
 		buildScan {
 			def toolchainVersion = settings.gradle.rootProject.findProperty('toolchainVersion')
 			if (toolchainVersion != null) {
@@ -102,13 +110,34 @@ include "spring-boot-tests:spring-boot-integration-tests:spring-boot-server-test
 include "spring-boot-system-tests:spring-boot-deployment-tests"
 include "spring-boot-system-tests:spring-boot-image-tests"
 
+
+// 我们可以知道 脚本都实现了 Script 接口,那么这个file可不是Project.file方法,而是脚本的Script 接口方法 ..
+
+// 这里由于我们的项目和逻辑路径不对应,所以我们通过这种方式  包括我们想要的项目 ...
+// include many projects whose project dirs do not match the logical project paths
+
+
+// 这种估计才算 ... https://docs.gradle.org/current/dsl/org.gradle.api.initialization.Settings.html # include method ...
+// include many projects whose project dirs do not match the logical project paths
+//file('subprojects').eachDir { dir ->
+//  include([dir.name])
+//  project(":${dir.name}").projectDir = dir
+//}
+
+// 当然这里应该是Spring boot 团队为了快速包括这些项目 所做了一个脚本逻辑循环 ...
 file("${rootDir}/spring-boot-project/spring-boot-starters").eachDirMatch(~/spring-boot-starter.*/) {
+	// 根据文件的名称进行项目包括  ...
 	include "spring-boot-project:spring-boot-starters:${it.name}"
 }
 
+// 冒烟测试 项目
 file("${rootDir}/spring-boot-tests/spring-boot-smoke-tests").eachDirMatch(~/spring-boot-smoke-test.*/) {
 	include "spring-boot-tests:spring-boot-smoke-tests:${it.name}"
 }
+
+
+
+
 
 include 'spring-boot-other-tests'
 

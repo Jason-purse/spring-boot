@@ -8,6 +8,7 @@ import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.JarURLConnection;
+import java.util.Collections;
 
 /**
  * 类加载器的测试

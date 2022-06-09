@@ -1,11 +1,23 @@
 // 根据Project 类型的描述,它可以直接在Project 对象上增加一个插件 , 或者使用  PluginDependenciesSpec 脚本块
 //https://www.yuque.com/gaolengdehulusi/nggog2/btuabt#ngYwh
 plugins {
+	// 同样  需要插件但是不应用,这里的版本已经被 settings文件中的 pluginManagement 处理了 ..(通过插件解析规则) ..
 	id "org.jetbrains.kotlin.jvm" apply false // https://youtrack.jetbrains.com/issue/KT-30276
 //	id "io.spring.nohttp" version "0.0.10"
 }
 
+// 设置项目描述 ...
 description = "Spring Boot Build"
+
+// 例如 开始构建时,没有提供任务时,使用的默认任务 ..
+// 一般来说都是 gradle build ...
+// 如果我们使用gradle 开始构建,那么也等价于 gradle build
+// 如果我们使用 gradlew .. (gradle wrapper) ... 它默认也是 gradlew build
+
+// 那么gradlew 和 gradle 的区别是
+
+// gradlew 包含了一个wrapper 脚本,能够缓存使用过的gradle daemon ... 能够加速构建 ..
+// 这就是为什么
 
 defaultTasks 'build'
 
@@ -19,18 +31,36 @@ defaultTasks 'build'
 //	source.exclude "spring-boot-project/spring-boot-tools/spring-boot-buildpack-platform/src/test/resources/org/springframework/boot/buildpack/platform/docker/export.tar"
 //}
 
-task build {
-//	dependsOn checkstyleNohttp
+// 其实这里 完全可以通过任务配置避免解决 ..
+// 没必要直接实例化此任务,除非真的需要 ...
+//task build {
+////	dependsOn checkstyleNohttp
+//}
+
+
+// 这个时候 我们应该了解以下 任务避免配置 ..
+tasks.register("build") {
+	// dependsOn checkstyleNohttp
 }
 
-allprojects {
-	group "org.springframework.boot"
+// 请记住,当前build.gradle的代理对象同样是 Project ..
 
+// 配置所有项目 ..
+allprojects {
+	// 传入的代理对象是 Project 实例(每一个配置的项目实例)
+	group "org.springframework.boot"
+	// 这里是Project#repositories 方法,创建仓库,用来拉取项目依赖, 如果版本包括 - 从spring 里程碑中拉取 ..
+	// 如果以快照结尾,那么包含一个快照仓库 ...
 	repositories {
 		mavenLocal()
+
+		// 每个项目尝试从阿里云上拉取 ...
 		maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
 		maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
 		mavenCentral()
+
+		// DefaultGroovyMethods 有一些默认方法可能能够直接在对象上使用 ...
+		// 详情查看 ... 此类 ..
 		if (version.contains('-')) {
 			maven { url "https://repo.spring.io/milestone" }
 		}
@@ -39,7 +69,10 @@ allprojects {
 		}
 	}
 
+	// 根据设定每一个配置 ...那么每一个配置都可以设定 resolutionStartegy .. 并且都存在动态方法,你可以选择使用Java Bean的形式访问  或者闭包方法处理 都可以 ...
 	configurations.all {
+		// 将所有的依赖进行配置 ...
+		// 这是groovy 的语法,方法可以去掉函数()
 		resolutionStrategy.cacheChangingModulesFor 0, "minutes"
 	}
 }

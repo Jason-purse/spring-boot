@@ -13,7 +13,8 @@ public class MyCustomPlugin implements Plugin<Project> {
 
 	@Override
 	public void apply(Project target) {
-		target.apply();
+//
+//		target.apply();
 	}
 }
 

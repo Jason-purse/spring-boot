@@ -33,6 +33,7 @@ import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.DependencySet;
+import org.gradle.api.logging.LogLevel;
 import org.gradle.api.plugins.JavaBasePlugin;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginExtension;
@@ -219,7 +220,9 @@ class JavaConventions {
 
 	private void configureJavadocConventions(Project project) {
 		// 配置编码 ...
-		project.getTasks().withType(Javadoc.class, (javadoc) -> javadoc.getOptions().source("1.8").encoding("UTF-8"));
+		project.getTasks().withType(Javadoc.class, (javadoc) -> {
+			javadoc.getOptions().source("1.8").encoding("UTF-8");
+		});
 	}
 
 	private void configureJavaConventions(Project project) {

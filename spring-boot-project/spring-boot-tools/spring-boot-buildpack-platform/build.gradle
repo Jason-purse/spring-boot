@@ -25,3 +25,6 @@ dependencies {
 	testImplementation("org.mockito:mockito-junit-jupiter")
 	testImplementation("org.skyscreamer:jsonassert")
 }
+tasks.named("javadoc") {
+
+}
