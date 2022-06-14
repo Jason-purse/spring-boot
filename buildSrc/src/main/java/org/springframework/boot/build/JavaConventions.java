@@ -203,6 +203,7 @@ class JavaConventions {
 			project.getTasks().withType(Checkstyle.class, (checkstyle) -> test.mustRunAfter(checkstyle));
 			project.getTasks().withType(CheckFormat.class, (checkFormat) -> test.mustRunAfter(checkFormat));
 		});
+		// 一个项目可以有很多依赖,通过不同的Configuration 进行分类 ....
 		project.getPlugins().withType(JavaPlugin.class, (javaPlugin) -> project.getDependencies()
 				.add(JavaPlugin.TEST_RUNTIME_ONLY_CONFIGURATION_NAME, "org.junit.platform:junit-platform-launcher"));
 		project.getPlugins().apply(TestRetryPlugin.class);
@@ -232,6 +233,10 @@ class JavaConventions {
 			// 工具链保证
 			JavaPluginExtension javaPluginExtension = project.getExtensions().getByType(JavaPluginExtension.class);
 			javaPluginExtension.setSourceCompatibility(JavaVersion.toVersion(SOURCE_AND_TARGET_COMPATIBILITY));
+			project.getLogger().info("存在工具链,设置语言支持级别为 1.8 ................");
+		}
+		else {
+			project.getLogger().info("没有工具链,按照 1.8进行构建 .....................");
 		}
 		// 针对JavaCompile 任务 配置 编译器参数 ..
 		// 开启 --parameters 编译,让编译器能够看到参数名称 ...

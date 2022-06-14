@@ -55,6 +55,11 @@ public class MavenRepositoryPlugin implements Plugin<Project> {
 	/**
 	 * Name of the task that publishes to the project repository.
 	 * 发布到项目仓库地址的任务名称 ..
+	 *
+	 * 设定了 PubName 等于 Maven, 于是PubName 对应了每一个publication(声明在publishing 的publications中的每一个发布物) ...
+	 * 仓库为 RepoName 等于 Project ...
+	 *
+	 * 这里针对DeployedPlugin 做的定制 ..
 	 */
 	public static final String PUBLISH_TO_PROJECT_REPOSITORY_TASK_NAME = "publishMavenPublicationToProjectRepository";
 
@@ -76,6 +81,8 @@ public class MavenRepositoryPlugin implements Plugin<Project> {
 		// matching 会导致所有的任务实例化(查看https://docs.gradle.org/current/userguide/task_configuration_avoidance.html#Existing vs New API overview 了解更多细节)
 		project.getTasks().matching((task) -> task.getName().equals(PUBLISH_TO_PROJECT_REPOSITORY_TASK_NAME))
 				.all((task) -> setUpProjectRepository(project, task, repositoryLocation));
+
+		// 这个任务 仅仅在 Gradle 内部的 MavenPluginPublishPlugin 才拥有
 		project.getTasks().matching((task) -> task.getName().equals("publishPluginMavenPublicationToProjectRepository"))
 				.all((task) -> setUpProjectRepository(project, task, repositoryLocation));
 	}

@@ -44,16 +44,24 @@ public class DeployedPlugin implements Plugin<Project> {
 
 		PublishingExtension publishing = project.getExtensions().getByType(PublishingExtension.class);
 
-		// 创建一个 maven Publication
+		// 创建一个 maven Publication(指定发布规则) ...(包括打包的jar 叫什么名称) ...
+		// 每一个发布,对应了一个发布物 ..
 		MavenPublication mavenPublication = publishing.getPublications().create("maven", MavenPublication.class);
 		project.afterEvaluate((evaluated) -> {
 			project.getPlugins().withType(JavaPlugin.class).all((javaPlugin) -> {
 				if (((Jar) project.getTasks().getByName(JavaPlugin.JAR_TASK_NAME)).isEnabled()) {
+					// 详情 https://www.yuque.com/gaolengdehulusi/nggog2/nbgs49#YStSd
+					// 详情 https://www.yuque.com/gaolengdehulusi/nggog2/nfbmzp#eUmQc
 					project.getComponents().matching((component) -> component.getName().equals("java"))
+							// 配置maven 发布  打包的组件来源 ...
 							.all((javaComponent) -> mavenPublication.from(javaComponent));
 				}
 			});
 		});
+
+
+		// 首先了解 Java 平台插件到底是什么 ..
+		// https://docs.gradle.org/current/userguide/java_platform_plugin.html#sec:java_platform_publishing
 		project.getPlugins().withType(JavaPlatformPlugin.class)
 				.all((javaPlugin) -> project.getComponents()
 						.matching((component) -> component.getName().equals("javaPlatform"))
