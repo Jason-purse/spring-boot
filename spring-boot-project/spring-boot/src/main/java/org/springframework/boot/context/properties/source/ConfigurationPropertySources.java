@@ -32,7 +32,7 @@ import org.springframework.util.Assert;
 
 /**
  * Provides access to {@link ConfigurationPropertySource ConfigurationPropertySources}.
- *
+ * 提供了一种机会访问 ConfigurationPropertySource ...
  * @author Phillip Webb
  * @since 2.0.0
  */
@@ -112,12 +112,18 @@ public final class ConfigurationPropertySources {
 	 */
 	public static Iterable<ConfigurationPropertySource> get(Environment environment) {
 		Assert.isInstanceOf(ConfigurableEnvironment.class, environment);
+
+		// 获取一个可修改的PropertySources ...
 		MutablePropertySources sources = ((ConfigurableEnvironment) environment).getPropertySources();
+		// 然后获取 ... configurationPropertySources ...
 		ConfigurationPropertySourcesPropertySource attached = (ConfigurationPropertySourcesPropertySource) sources
 				.get(ATTACHED_PROPERTY_SOURCE_NAME);
+
+		// 如果没有configurationProperties ...
 		if (attached == null) {
 			return from(sources);
 		}
+		// 否则直接获取Sources ...
 		return attached.getSource();
 	}
 
@@ -146,6 +152,7 @@ public final class ConfigurationPropertySources {
 	 * {@link SpringConfigurationPropertySource} instances
 	 */
 	public static Iterable<ConfigurationPropertySource> from(Iterable<PropertySource<?>> sources) {
+		// 将它转换为ConfigurationPropertySource ...
 		return new SpringConfigurationPropertySources(sources);
 	}
 

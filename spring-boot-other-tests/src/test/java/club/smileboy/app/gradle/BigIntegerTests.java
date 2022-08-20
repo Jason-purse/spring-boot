@@ -13,6 +13,18 @@ import java.util.Arrays;
  * @date 2022/6/9
  * @time 11:27
  * @Description gradle wrapper task hash caculation...
+ *
+ *
+ * 这里主要是探讨  grale wrapper 任务在将对应的distribution 包解压并创建一个存放的根目录所用的hash算法的一部分 ..
+ * 它将 发行包名称使用MD5 加密之后 -> 作为一个大数处理 ..
+ * 然后将这个大数 作为 BigInteger 的magnitude 片段,然后进行大数合成 ... 最终实现 36进制下产生一个文件夹(具有 0-9 a-z) ...
+ *
+ *
+ * 随便再将进制  符号位进行理解 ....
+ *
+ * 参考文章: http://www.hollischuang.com/archives/176
+ *
+ *
  */
 public class BigIntegerTests {
 

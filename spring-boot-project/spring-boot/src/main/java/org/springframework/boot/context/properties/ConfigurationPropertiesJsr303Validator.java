@@ -28,6 +28,8 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
  * Validator that supports configuration classes annotated with
  * {@link Validated @Validated}.
  *
+ * 支持对 配置类 使用Validated 进行校验 ...
+ *
  * @author Phillip Webb
  */
 final class ConfigurationPropertiesJsr303Validator implements Validator {

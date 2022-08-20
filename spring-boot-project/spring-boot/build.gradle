@@ -151,6 +151,17 @@ compileJava {
 	doLast new org.springframework.boot.build.log4j2.ReproducibleLog4j2PluginsDatAction()
 }
 
+// 指定了测试Jvm 参数 ...
 toolchain {
 	testJvmArgs.add("--add-opens=java.base/java.net=ALL-UNNAMED")
+	// 对于一个只读属性,无法修改  这个属性 ..,否则会报错,既然如此我们在ToolchainPlugin 中的 条件判断就无效了 ...
+//	javaVersion.JavaVersion.VERSION_17
+}
+ //  测试 ..
+test {
+	filter {
+		excludeTest("org.springframework.boot.env.ConfigTreePropertySourceTests","getPropertyNamesFromFlatWithSymlinksIgnoresHiddenFiles")
+		excludeTest("org.springframework.boot.env.ConfigTreePropertySourceTests","getPropertyNamesFromNestedWithSymlinkInPathReturnsPropertyNames")
+		excludeTest("org.springframework.boot.env.ConfigTreePropertySourceTests","getPropertyNamesFromNestedWithSymlinksIgnoresHiddenFiles")
+	}
 }

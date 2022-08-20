@@ -31,6 +31,7 @@ import org.springframework.validation.beanvalidation.MethodValidationPostProcess
  * Custom {@link MethodValidationPostProcessor} that applies
  * {@link MethodValidationExcludeFilter exclusion filters}.
  *
+ * 自定义的方法验证后置处理器,它可以应用  MethodValidationExcludeFilter ...
  * @author Andy Wilkinson
  * @since 2.4.0
  */

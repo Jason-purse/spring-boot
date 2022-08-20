@@ -25,6 +25,8 @@ import org.springframework.util.Assert;
 /**
  * {@link BindHandler} that can be used to track bound configuration properties.
  *
+ * 这个BindHandler 能够被用来跟踪 bound configuration properties ...
+ *
  * @author Madhura Bhave
  * @since 2.3.0
  */

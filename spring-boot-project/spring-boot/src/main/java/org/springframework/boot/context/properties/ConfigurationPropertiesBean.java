@@ -52,6 +52,10 @@ import org.springframework.validation.annotation.Validated;
  * {@link #get(ApplicationContext, Object, String) individual beans} on a case-by-case
  * basis (for example, in a {@link BeanPostProcessor}).
  *
+ *
+ * 提供了访问ConfigurationProperties bean 的细节 ... 不管这个注解是直接使用或者使用在@Bean方法上,这个类能够通过getAll(ApplicationContext)访问所有的配置属性bean ..
+ * 或者通过get(ApplicationContext,Object,String) 获取独立的bean( 一对一获取) ..
+ *
  * @author Phillip Webb
  * @since 2.2.0
  * @see #getAll(ApplicationContext)
@@ -65,6 +69,7 @@ public final class ConfigurationPropertiesBean {
 
 	private final ConfigurationProperties annotation;
 
+	// 知道了绑定目标, 以及绑定方法 ..
 	private final Bindable<?> bindTarget;
 
 	private final BindMethod bindMethod;
@@ -197,7 +202,9 @@ public final class ConfigurationPropertiesBean {
 	 * {@link ConfigurationProperties @ConfigurationProperties}
 	 */
 	public static ConfigurationPropertiesBean get(ApplicationContext applicationContext, Object bean, String beanName) {
+		// 获取 工厂方法 ..
 		Method factoryMethod = findFactoryMethod(applicationContext, beanName);
+		// 拿到工厂方法之后 ...
 		return create(beanName, bean, bean.getClass(), factoryMethod);
 	}
 
@@ -221,6 +228,7 @@ public final class ConfigurationPropertiesBean {
 					return resolvedFactoryMethod;
 				}
 			}
+			// 通过反射获取 ...
 			return findFactoryMethodUsingReflection(beanFactory, beanDefinition);
 		}
 		return null;
@@ -233,6 +241,7 @@ public final class ConfigurationPropertiesBean {
 		if (factoryMethodName == null || factoryBeanName == null) {
 			return null;
 		}
+
 		Class<?> factoryType = beanFactory.getType(factoryBeanName);
 		if (factoryType.getName().contains(ClassUtils.CGLIB_CLASS_SEPARATOR)) {
 			factoryType = factoryType.getSuperclass();
@@ -243,6 +252,7 @@ public final class ConfigurationPropertiesBean {
 				factoryMethod.set(method);
 			}
 		});
+		// 拿到最后一次设置的 方法 ...
 		return factoryMethod.get();
 	}
 
@@ -253,20 +263,27 @@ public final class ConfigurationPropertiesBean {
 		return propertiesBean;
 	}
 
+	// 开始创建ConfigurationProperties Bean ..
 	private static ConfigurationPropertiesBean create(String name, Object instance, Class<?> type, Method factory) {
 		ConfigurationProperties annotation = findAnnotation(instance, type, factory, ConfigurationProperties.class);
 		if (annotation == null) {
 			return null;
 		}
+		// 获取验证接口 ...
 		Validated validated = findAnnotation(instance, type, factory, Validated.class);
 		Annotation[] annotations = (validated != null) ? new Annotation[] { annotation, validated }
 				: new Annotation[] { annotation };
+		// 如果工厂为空 .. / 也就是构造器 ...
 		ResolvableType bindType = (factory != null) ? ResolvableType.forMethodReturnType(factory)
 				: ResolvableType.forClass(type);
+		// 根据bindType 创建Bindable ..
 		Bindable<Object> bindTarget = Bindable.of(bindType).withAnnotations(annotations);
+
 		if (instance != null) {
+			// bind目标 是特定的值 ...  然后重新设置 ..
 			bindTarget = bindTarget.withExistingValue(instance);
 		}
+
 		return new ConfigurationPropertiesBean(name, instance, annotation, bindTarget);
 	}
 

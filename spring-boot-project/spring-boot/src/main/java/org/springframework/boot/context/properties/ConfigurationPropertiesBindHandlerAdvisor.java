@@ -23,6 +23,10 @@ import org.springframework.boot.context.properties.bind.BindHandler;
  * Allows additional functionality to be applied to the {@link BindHandler} used by the
  * {@link ConfigurationPropertiesBindingPostProcessor}.
  *
+ * 允许额外的功能对BindHandler 进行增强 ....
+ *
+ * 例如 增加默认值 ...
+ *
  * @author Phillip Webb
  * @since 2.1.0
  * @see AbstractBindHandler

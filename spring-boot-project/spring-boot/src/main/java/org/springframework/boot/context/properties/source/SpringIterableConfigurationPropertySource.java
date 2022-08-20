@@ -46,6 +46,10 @@ import org.springframework.core.env.SystemEnvironmentPropertySource;
  * enumerable. A security restricted {@link SystemEnvironmentPropertySource} cannot be
  * adapted.
  *
+ * 由 EnumerablePropertySource 支持 ..
+ * 扩展与SpringConfigurationPropertySource  具有完全松散的映射支持 ..
+ * 为了使用这个适配器,底层的PropertySource 必须完全可枚举 ... 一个安全受限的SystemEnvironmentPropertySource 不能适配 ..
+ *
  * @author Phillip Webb
  * @author Madhura Bhave
  * @see PropertyMapper
@@ -172,6 +176,9 @@ class SpringIterableConfigurationPropertySource extends SpringConfigurationPrope
 		if (source instanceof OriginLookup) {
 			return ((OriginLookup<?>) source).isImmutable();
 		}
+
+		// 系统环境变量 不一定永远不会变吧!!!
+		// 但是生产环境下  也不会更改,可以认为是不变的 ..
 		if (StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME.equals(source.getName())) {
 			return source.getSource() == System.getenv();
 		}

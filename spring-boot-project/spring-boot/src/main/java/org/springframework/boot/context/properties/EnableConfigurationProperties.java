@@ -31,6 +31,7 @@ import org.springframework.context.annotation.Import;
  * (for example using {@link Bean @Bean} methods) or, for convenience, can be specified
  * directly on this annotation.
  *
+ * 启用对 ConfigurationProperties注解的 bean 支持 ...
  * @author Dave Syer
  * @since 1.0.0
  */

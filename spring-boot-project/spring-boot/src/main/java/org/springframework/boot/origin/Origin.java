@@ -27,9 +27,13 @@ import java.util.Set;
  * Interface that uniquely represents the origin of an item. For example, an item loaded
  * from a {@link File} may have an origin made up of the file name along with line/column
  * numbers.
+ *
+ * 这个接口唯一的表示一项数据的来源,例如 它从文件中加载(也许有一个来源,由文件名 和 行 / 列号构成) ..
  * <p>
  * Implementations must provide sensible {@code hashCode()}, {@code equals(...)} and
  * {@code #toString()} implementations.
+ *
+ * 实现必须提供合理的 hashCode / equals  / toString ..
  *
  * @author Madhura Bhave
  * @author Phillip Webb

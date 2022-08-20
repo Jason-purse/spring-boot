@@ -32,6 +32,8 @@ import org.springframework.util.Assert;
  * Bean to record and provide bound
  * {@link ConfigurationProperties @ConfigurationProperties}.
  *
+ *
+ * 记录并提供约束的ConfigurationProperties ...
  * @author Madhura Bhave
  * @since 2.3.0
  */
@@ -44,6 +46,7 @@ public class BoundConfigurationProperties {
 	 */
 	private static final String BEAN_NAME = BoundConfigurationProperties.class.getName();
 
+	// 进行配置属性名 到对应的配置属性的记忆 ...
 	void add(ConfigurationProperty configurationProperty) {
 		this.properties.put(configurationProperty.getName(), configurationProperty);
 	}

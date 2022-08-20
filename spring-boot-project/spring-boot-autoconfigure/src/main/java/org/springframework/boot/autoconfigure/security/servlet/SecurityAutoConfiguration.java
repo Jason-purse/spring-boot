@@ -31,7 +31,7 @@ import org.springframework.security.authentication.DefaultAuthenticationEventPub
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for Spring Security.
- *
+ * spring security 的自动配置 ...
  * @author Dave Syer
  * @author Andy Wilkinson
  * @author Madhura Bhave
@@ -39,11 +39,16 @@ import org.springframework.security.authentication.DefaultAuthenticationEventPub
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(DefaultAuthenticationEventPublisher.class)
+
+// 启动配置 ...
 @EnableConfigurationProperties(SecurityProperties.class)
+
+// 导入三个配置 ...
 @Import({ SpringBootWebSecurityConfiguration.class, WebSecurityEnablerConfiguration.class,
 		SecurityDataConfiguration.class })
 public class SecurityAutoConfiguration {
 
+	// 加入一个认证事件派发器 ...
 	@Bean
 	@ConditionalOnMissingBean(AuthenticationEventPublisher.class)
 	public DefaultAuthenticationEventPublisher authenticationEventPublisher(ApplicationEventPublisher publisher) {

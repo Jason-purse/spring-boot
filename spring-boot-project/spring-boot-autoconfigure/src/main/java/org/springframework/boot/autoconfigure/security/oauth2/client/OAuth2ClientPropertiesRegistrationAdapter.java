@@ -56,10 +56,14 @@ public final class OAuth2ClientPropertiesRegistrationAdapter {
 
 	private static ClientRegistration getClientRegistration(String registrationId,
 			OAuth2ClientProperties.Registration properties, Map<String, Provider> providers) {
+
 		Builder builder = getBuilderFromIssuerIfPossible(registrationId, properties.getProvider(), providers);
 		if (builder == null) {
+			// 尝试从 CommonProvider中获取 ..
 			builder = getBuilder(registrationId, properties.getProvider(), providers);
 		}
+
+		// 属性映射器 ...
 		PropertyMapper map = PropertyMapper.get().alwaysApplyingWhenNonNull();
 		map.from(properties::getClientId).to(builder::clientId);
 		map.from(properties::getClientSecret).to(builder::clientSecret);
@@ -76,6 +80,7 @@ public final class OAuth2ClientPropertiesRegistrationAdapter {
 	private static Builder getBuilderFromIssuerIfPossible(String registrationId, String configuredProviderId,
 			Map<String, Provider> providers) {
 		String providerId = (configuredProviderId != null) ? configuredProviderId : registrationId;
+		// 如果有自定义提供器 指示 ..
 		if (providers.containsKey(providerId)) {
 			Provider provider = providers.get(providerId);
 			String issuer = provider.getIssuerUri();

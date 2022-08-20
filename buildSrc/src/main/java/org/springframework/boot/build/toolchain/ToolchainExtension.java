@@ -22,23 +22,38 @@ import org.gradle.api.provider.Property;
 import org.gradle.jvm.toolchain.JavaLanguageVersion;
 
 /**
+ * 工具链插件的DSL
+ *
  * DSL extension for {@link ToolchainPlugin}.
  *
  * @author Christoph Dreis
  */
 public class ToolchainExtension {
 
+	// 最大兼容版本 ...
+	// 插件只支持三种类型的属性 ...
+
+	// 当然这里的扩展 类型应该是随意的吧  后续了解 ...
 	private final Property<JavaLanguageVersion> maximumCompatibleJavaVersion;
 
 	private final ListProperty<String> testJvmArgs;
 
 	private final JavaLanguageVersion javaVersion;
 
+	// 这里应该是配置默认值
 	public ToolchainExtension(Project project) {
+		// 构建这样的一个扩展 ...
+		// 尝试拿取一个JavaLanguageVersion 类型的属性 ...
+		// 切记没有拿取当前gradle 构建所使用的 version , 因为有可能不一样(项目的想要使用的version 可能不一致) ....
 		this.maximumCompatibleJavaVersion = project.getObjects().property(JavaLanguageVersion.class);
+		//
 		this.testJvmArgs = project.getObjects().listProperty(String.class);
+
+		// 获取到了工具链版本 ...
 		String toolchainVersion = (String) project.findProperty("toolchainVersion");
+		// 进行解析 ...
 		this.javaVersion = (toolchainVersion != null) ? JavaLanguageVersion.of(toolchainVersion) : null;
+
 	}
 
 	public Property<JavaLanguageVersion> getMaximumCompatibleJavaVersion() {

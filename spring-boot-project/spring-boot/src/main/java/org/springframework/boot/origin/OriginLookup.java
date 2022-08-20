@@ -20,6 +20,8 @@ package org.springframework.boot.origin;
  * An interface that may be implemented by an object that can lookup {@link Origin}
  * information from a given key. Can be used to add origin support to existing classes.
  *
+ * 源头查询(能够查询一个key的Origin 信息), 能够被用来对已有的类增加origin 支持 ...
+ *
  * @param <K> the lookup key type
  * @author Phillip Webb
  * @since 2.0.0
@@ -48,9 +50,12 @@ public interface OriginLookup<K> {
 	/**
 	 * Return the implicit prefix that is applied when performing a lookup or {@code null}
 	 * if no prefix is used. Prefixes can be used to disambiguate keys that would
-	 * otherwise clash. For example, if multiple applications are running on the same
+	 * otherwise clash.
+	 * For example, if multiple applications are running on the same
 	 * machine a different prefix can be set on each application to ensure that different
 	 * environment variables are used.
+	 *
+	 * 举个例子,如果多个应用运行在相同机器上(每一个应用可以设置不同的prefix,确保使用不同的环境变量) ..
 	 * @return the prefix applied by the lookup class or {@code null}.
 	 * @since 2.5.0
 	 */

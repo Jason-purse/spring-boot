@@ -1,6 +1,6 @@
 package club.smileboy.app.java;
 
-import club.smileboy.app.ClassLoaderTests;
+import club.smileboy.app.classLoader.ClassLoaderTests;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;

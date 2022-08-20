@@ -29,6 +29,7 @@ import org.springframework.util.Assert;
  * {@link BindConstructorProvider} used when binding
  * {@link ConfigurationProperties @ConfigurationProperties}.
  *
+ * 通过构造器来绑定ConfiguraitonProperties ...
  * @author Madhura Bhave
  * @author Phillip Webb
  */

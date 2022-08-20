@@ -36,6 +36,8 @@ import org.springframework.util.ConcurrentReferenceHashMap.ReferenceType;
  * Adapter to convert Spring's {@link MutablePropertySources} to
  * {@link ConfigurationPropertySource ConfigurationPropertySources}.
  *
+ * 将Spring 的 MutablePropertySources 适配到 ConfigurationPropertySource ...
+ *
  * @author Phillip Webb
  */
 class SpringConfigurationPropertySources implements Iterable<ConfigurationPropertySource> {
@@ -61,13 +63,19 @@ class SpringConfigurationPropertySources implements Iterable<ConfigurationProper
 
 	private ConfigurationPropertySource adapt(PropertySource<?> source) {
 		ConfigurationPropertySource result = this.cache.get(source);
+		// 大多数PropertySources 测试等价 仅仅在使用source name的情况下可用,其他情况下我们应该检测实际的source 是否没有改变 ..
 		// Most PropertySources test equality only using the source name, so we need to
 		// check the actual source hasn't also changed.
 		if (result != null && result.getUnderlyingSource() == source) {
 			return result;
 		}
+
+		// 否则??
 		result = SpringConfigurationPropertySource.from(source);
+
+		//  如果 来源查找 ...
 		if (source instanceof OriginLookup) {
+			// 然后
 			result = result.withPrefix(((OriginLookup<?>) source).getPrefix());
 		}
 		this.cache.put(source, result);

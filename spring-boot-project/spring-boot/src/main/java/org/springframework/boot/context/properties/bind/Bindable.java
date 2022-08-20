@@ -34,6 +34,7 @@ import org.springframework.util.ObjectUtils;
 /**
  * Source that can be bound by a {@link Binder}.
  *
+ * 一个 Source 能够被Binder 进行绑定 ..
  * @param <T> the source type
  * @author Phillip Webb
  * @author Madhura Bhave
@@ -169,6 +170,7 @@ public final class Bindable<T> {
 	 * @return an updated {@link Bindable}
 	 */
 	public Bindable<T> withAnnotations(Annotation... annotations) {
+		// 创建一个新的Bindable .. 并包含注解 ...
 		return new Bindable<>(this.type, this.boxedType, this.value,
 				(annotations != null) ? annotations : NO_ANNOTATIONS, NO_BIND_RESTRICTIONS);
 	}
@@ -276,17 +278,27 @@ public final class Bindable<T> {
 	 */
 	public static <T> Bindable<T> of(ResolvableType type) {
 		Assert.notNull(type, "Type must not be null");
+		// 盒化
 		ResolvableType boxedType = box(type);
+		// 创建一个Bindable ..
 		return new Bindable<>(type, boxedType, null, NO_ANNOTATIONS, NO_BIND_RESTRICTIONS);
 	}
 
 	private static ResolvableType box(ResolvableType type) {
 		Class<?> resolved = type.resolve();
+
+		// 学到了 ...
 		if (resolved != null && resolved.isPrimitive()) {
+			// 如果是基础类型,会自动的包装一个默认值在里面 ...
 			Object array = Array.newInstance(resolved, 1);
+			// 获取包装类型 ...
 			Class<?> wrapperType = Array.get(array, 0).getClass();
+			// 然后返回包装类型 ...
 			return ResolvableType.forClass(wrapperType);
 		}
+
+		// 解析不为空 , 并且解析是一个数组 ... 那么返回ComponentType ...
+		// 这样玩的语义取决你要干什么 ...
 		if (resolved != null && resolved.isArray()) {
 			return ResolvableType.forArrayComponent(box(type.getComponentType()));
 		}

@@ -93,6 +93,7 @@ public class ConfigurationPropertiesBindingPostProcessor
 		}
 	}
 
+	// 也就是被@EnableConfigurationProperties 处理过 ...
 	private boolean hasBoundValueObject(String beanName) {
 		return this.registry.containsBeanDefinition(beanName) && BindMethod.VALUE_OBJECT
 				.equals(this.registry.getBeanDefinition(beanName).getAttribute(BindMethod.class.getName()));

@@ -60,6 +60,8 @@ public class DeployedPlugin implements Plugin<Project> {
 		});
 
 
+		// 由于 JavaPlugin 不可和平台插件混用,那么这里两者的互斥关系,应该在子项目中有所体现
+		// 例如使用了JavaPlugin的项目不可能使用平台插件 ...
 		// 首先了解 Java 平台插件到底是什么 ..
 		// https://docs.gradle.org/current/userguide/java_platform_plugin.html#sec:java_platform_publishing
 		project.getPlugins().withType(JavaPlatformPlugin.class)

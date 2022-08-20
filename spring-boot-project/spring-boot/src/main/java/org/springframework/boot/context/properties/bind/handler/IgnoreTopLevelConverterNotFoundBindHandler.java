@@ -27,6 +27,7 @@ import org.springframework.core.convert.ConverterNotFoundException;
  * {@link BindHandler} that can be used to ignore top-level
  * {@link ConverterNotFoundException}s.
  *
+ * 这个BindHandler 能够被用来忽略顶级ConveterNotFoundException ...
  * @author Madhura Bhave
  * @since 2.0.1
  */

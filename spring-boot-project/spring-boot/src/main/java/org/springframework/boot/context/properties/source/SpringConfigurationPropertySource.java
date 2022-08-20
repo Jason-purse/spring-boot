@@ -44,6 +44,15 @@ import org.springframework.util.Assert;
  * When possible the {@link SpringIterableConfigurationPropertySource} will be used in
  * preference to this implementation since it supports full "relaxed" style resolution.
  *
+ *  一个被 不可枚举的Spring PropertySource或者 一个受限的EnumerablePropertySource(例如 一个安全受限的systemEnvironment资源) 实现支持
+ *  一个PropertySource 通过PropertyMapper 进行映射(提供了对单个属性的单独映射规则) ...
+ *
+ *  ConfigurationPropertySource#getConfigurationProperty 调用将尝试基于名称 一对一映射
+ *  通过 PropertyMapper#map(ConfigurationPropertyName) -> 到一个或者多个 ... 基于名称的字符串 ..
+ *  者允许快速的属性解析(对于形式良好的属性源) ..
+ *
+ *  当必要时,SpringIterableConfigurationPropertySource 更优先于此实现,因为它支持 完全松散的风格 解析 ..
+ *
  * @author Phillip Webb
  * @author Madhura Bhave
  * @see #from(PropertySource)
@@ -143,14 +152,18 @@ class SpringConfigurationPropertySource implements ConfigurationPropertySource {
 	 */
 	static SpringConfigurationPropertySource from(PropertySource<?> source) {
 		Assert.notNull(source, "Source must not be null");
+		// 获取 从 source 中获取属性 mapper ..
 		PropertyMapper[] mappers = getPropertyMappers(source);
+		// 如果是可枚举的 ... 所以首选  SpringIterableConfigurationPropertySource
 		if (isFullEnumerable(source)) {
 			return new SpringIterableConfigurationPropertySource((EnumerablePropertySource<?>) source, mappers);
 		}
+		// 如果对于不完全枚举的,获取不到,直接返回 null ..
 		return new SpringConfigurationPropertySource(source, mappers);
 	}
 
 	private static PropertyMapper[] getPropertyMappers(PropertySource<?> source) {
+		// 如果 为系统环境属性PropertySource ...
 		if (source instanceof SystemEnvironmentPropertySource && hasSystemEnvironmentName(source)) {
 			return SYSTEM_ENVIRONMENT_MAPPERS;
 		}
@@ -163,10 +176,13 @@ class SpringConfigurationPropertySource implements ConfigurationPropertySource {
 				|| name.endsWith("-" + StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME);
 	}
 
+	// 完全可枚举的...
 	private static boolean isFullEnumerable(PropertySource<?> source) {
 		PropertySource<?> rootSource = getRootSource(source);
+		// 如果为 Map ..
 		if (rootSource.getSource() instanceof Map) {
 			// Check we're not security restricted
+			// 检查没有安全限制 ...
 			try {
 				((Map<?, ?>) rootSource.getSource()).size();
 			}

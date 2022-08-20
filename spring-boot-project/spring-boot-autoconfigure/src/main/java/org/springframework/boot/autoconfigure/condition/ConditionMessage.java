@@ -32,6 +32,9 @@ import org.springframework.util.StringUtils;
  * A message associated with a {@link ConditionOutcome}. Provides a fluent builder style
  * API to encourage consistency across all condition messages.
  *
+ * 一个消息关联一个 ConditionOutcome ..
+ * 提供了流式构建风格的API 鼓励 所有条件消息的一致性 ...
+ *
  * @author Phillip Webb
  * @since 1.4.1
  */

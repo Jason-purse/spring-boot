@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Conditional;
  * {@link Conditional @Conditional} that only matches when web security is available and
  * the user has not defined their own configuration.
  *
+ * 是否启用默认的WebSecurity配置(如果 web security 是可用的,并且用户没有定义它自己的配置) ...
  * @author Phillip Webb
  * @since 2.4.0
  */

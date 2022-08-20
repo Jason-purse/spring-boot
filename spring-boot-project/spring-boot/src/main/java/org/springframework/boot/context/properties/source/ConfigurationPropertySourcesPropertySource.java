@@ -27,6 +27,8 @@ import org.springframework.core.env.PropertySource;
  * that they can be used with a {@link PropertyResolver} or added to the
  * {@link Environment}.
  *
+ * PropertySource 暴露 ConfigurationPropertySource 实例(因此 它能够被PropertyResolver 使用) 或者增加到 Environment ...
+ *
  * @author Phillip Webb
  * @author Madhura Bhave
  */

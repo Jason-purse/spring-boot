@@ -24,6 +24,7 @@ import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
 /**
  * A filter for excluding types from method validation.
  *
+ * 从方法验证中排除 的类型过滤器 ...
  * @author Andy Wilkinson
  * @since 2.4.0
  * @see FilteredMethodValidationPostProcessor

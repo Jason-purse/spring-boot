@@ -48,6 +48,10 @@ import org.springframework.util.StringUtils;
  * {@link AuthenticationManager}, {@link AuthenticationProvider} or
  * {@link UserDetailsService}.
  *
+ * 导入内存型的AuthenticationManager ... (将前面配置的User 加入到这个数据源中) ..
+ *
+ * 如果我们需要定制,通过提供自己的AuthenticationManager 以及 AuthenticationProvider 或者 UserDetailsService 就能够禁用 ...
+ *
  * @author Dave Syer
  * @author Rob Winch
  * @author Madhura Bhave
@@ -69,6 +73,13 @@ public class UserDetailsServiceAutoConfiguration {
 
 	private static final Log logger = LogFactory.getLog(UserDetailsServiceAutoConfiguration.class);
 
+
+	/**
+	 * 并且这个在缺少  ClientRegistrationRepository的时候才加入 ...(也就是一般使用了 OAuth2 就不应该使用这种方式) .. 猜测
+	 * @param properties
+	 * @param passwordEncoder
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnMissingBean(
 			type = "org.springframework.security.oauth2.client.registration.ClientRegistrationRepository")
@@ -82,6 +93,12 @@ public class UserDetailsServiceAutoConfiguration {
 						.roles(StringUtils.toStringArray(roles)).build());
 	}
 
+	/**
+	 * 这里也解释了(使用密码的格式)
+	 * @param user 用户
+	 * @param encoder 编码器(这是一个代理密码编码器,支持多种编码类型)
+	 * @return
+	 */
 	private String getOrDeducePassword(SecurityProperties.User user, PasswordEncoder encoder) {
 		String password = user.getPassword();
 		if (user.isPasswordGenerated()) {

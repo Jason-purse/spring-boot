@@ -22,6 +22,7 @@ import org.springframework.util.Assert;
 /**
  * {@link Origin} from a {@link PropertySource}.
  *
+ * 获取一个PropertySource 的 Origin ...
  * @author Phillip Webb
  * @since 2.0.0
  */

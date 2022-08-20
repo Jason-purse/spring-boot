@@ -21,6 +21,7 @@ import org.gradle.api.Project;
 import org.gradle.api.attributes.Usage;
 import org.gradle.api.component.AdhocComponentWithVariants;
 import org.gradle.api.component.ConfigurationVariantDetails;
+import org.gradle.api.component.SoftwareComponent;
 import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.plugins.JavaPluginConvention;
 import org.gradle.api.plugins.JavaPluginExtension;
@@ -36,6 +37,10 @@ import org.gradle.api.publish.maven.MavenPublication;
 import org.gradle.api.publish.maven.plugins.MavenPublishPlugin;
 
 /**
+ *
+ * 对于默认的约定 来说, 这里会创建一个 deploymentRepository 属性的仓库地址 ....(例如在build-project.sh中都通过命令行的形式指定了仓库的地址) ...
+ * 所以一旦有这个属性,那么我们设定这样的一个仓库 ...
+ * 并且 为这个项目创建MavenPublish 用于发布 ...
  * Conventions that are applied in the presence of the {@link MavenPublishPlugin}. When
  * the plugin is applied:
  *
@@ -80,8 +85,12 @@ class MavenPublishingConventions {
 
 	private void customizeMavenPublication(MavenPublication publication, Project project) {
 		customizePom(publication.getPom(), project);
+
+
 		project.getPlugins().withType(JavaPlugin.class)
 				.all((javaPlugin) -> customizeJavaMavenPublication(publication, project));
+
+		// 压制Maven 可选特性的警告 ...
 		suppressMavenOptionalFeatureWarnings(publication);
 	}
 
@@ -100,8 +109,10 @@ class MavenPublishingConventions {
 		}
 	}
 
+	// 定制Maven 发布,它如何控制版本 ..
 	private void customizeJavaMavenPublication(MavenPublication publication, Project project) {
 		addMavenOptionalFeature(project);
+
 		publication.versionMapping((strategy) -> strategy.usage(Usage.JAVA_API, (mappingStrategy) -> mappingStrategy
 				.fromResolutionOf(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)));
 		publication.versionMapping(
@@ -109,17 +120,29 @@ class MavenPublishingConventions {
 	}
 
 	/**
+	 * 增加一个可选的特性 - 允许maven 插件去声明 可选的依赖出现在POM 中,这在Eclipse中愉快的使用m2e 是必要的 ...
 	 * Add a feature that allows maven plugins to declare optional dependencies that
 	 * appear in the POM. This is required to make m2e in Eclipse happy.
 	 * @param project the project to add the feature to
 	 */
 	private void addMavenOptionalFeature(Project project) {
+		// 约定 和  扩展都是一样的 ...
+		// 都添加了一些 脚本块...
 		JavaPluginExtension extension = project.getExtensions().getByType(JavaPluginExtension.class);
 		JavaPluginConvention convention = project.getConvention().getPlugin(JavaPluginConvention.class);
+
+		// 为扩展注册一个能力, 让这个特性使用资源集 (main) ...
 		extension.registerFeature("mavenOptional",
 				(feature) -> feature.usingSourceSet(convention.getSourceSets().getByName("main")));
+
+		// 具有变体的临时组件 .. 通过项目获取组件
+		// 目前我已知晓的 组件也就是 components.java / javaplatform
+		// 分别由java 插件提供   / java 平台插件提供 ...
 		AdhocComponentWithVariants javaComponent = (AdhocComponentWithVariants) project.getComponents()
 				.findByName("java");
+
+//		从配置增加变种
+		// 盲猜 configuration 最终要映射为对应的元素 ...
 		javaComponent.addVariantsFromConfiguration(
 				project.getConfigurations().findByName("mavenOptionalRuntimeElements"),
 				ConfigurationVariantDetails::mapToOptional);

@@ -47,12 +47,17 @@ import org.springframework.util.Assert;
  * A container object which Binds objects from one or more
  * {@link ConfigurationPropertySource ConfigurationPropertySources}.
  *
+ * 一个容器对象 用来绑定来自一个或者多个 ConfigurationPropertySource ...
+ *
  * @author Phillip Webb
  * @author Madhura Bhave
  * @since 2.0.0
  */
 public class Binder {
 
+	/**
+	 * object / class 不是bean ...
+	 */
 	private static final Set<Class<?>> NON_BEAN_CLASSES = Collections
 			.unmodifiableSet(new HashSet<>(Arrays.asList(Object.class, Class.class)));
 
@@ -523,6 +528,8 @@ public class Binder {
 	 * @since 2.2.0
 	 */
 	public static Binder get(Environment environment, BindHandler defaultBindHandler) {
+
+		//
 		Iterable<ConfigurationPropertySource> sources = ConfigurationPropertySources.get(environment);
 		PropertySourcesPlaceholdersResolver placeholdersResolver = new PropertySourcesPlaceholdersResolver(environment);
 		return new Binder(sources, placeholdersResolver, null, null, defaultBindHandler);

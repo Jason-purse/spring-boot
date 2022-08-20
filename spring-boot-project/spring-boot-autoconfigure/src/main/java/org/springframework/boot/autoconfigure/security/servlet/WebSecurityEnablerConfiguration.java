@@ -31,6 +31,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
  * added or if a bean with name {@value BeanIds#SPRING_SECURITY_FILTER_CHAIN} has been
  * configured by the user, this will back-off.
  *
+ * 首先增加这个注解(如果spring security在类路径上) , 这将确保注解与默认的security 自动配置一同存在并且如果用户增加了自定义security 并且(在忘记增加此注解的时候会启用) ..
+ * 如果此注解已经被增加或者 一个具有 {@value BeanIds#SPRING_SECURITY_FILTER_CHAIN}的 bean 已经被用户配置,那么这将会失效(也就是不会配置)  ...
+ *
+ * 同样可以看出来,同样是启用默认的 配置,例如 @EnableWebSecurity
+ * 这也看出来,@Bean的注册在于@Configuration 解析之后 ...
  * @author Madhura Bhave
  */
 @Configuration(proxyBeanMethods = false)

@@ -42,6 +42,9 @@ import org.springframework.security.web.context.AbstractSecurityWebApplicationIn
  * the filter's order is still configured when a user-provided
  * {@link WebSecurityConfiguration} exists.
  *
+ * spring security的过滤器的自动配置
+ * 这个配置独立于SpringBootWebSecurityConfiguration 确保过滤器的顺序仍然是可配置的(当用户提供的WebSecurityConfiguration 存在的时候)
+ *
  * @author Rob Winch
  * @author Phillip Webb
  * @author Andy Wilkinson
@@ -54,8 +57,16 @@ import org.springframework.security.web.context.AbstractSecurityWebApplicationIn
 @AutoConfigureAfter(SecurityAutoConfiguration.class)
 public class SecurityFilterAutoConfiguration {
 
+	/**
+	 * 默认名称 。。
+	 */
 	private static final String DEFAULT_FILTER_NAME = AbstractSecurityWebApplicationInitializer.DEFAULT_FILTER_NAME;
 
+	/**
+	 * 创建DelegatingFilterProxy .... 将这个具体的filter 创建出来了 ...
+	 * @param securityProperties
+	 * @return
+	 */
 	@Bean
 	@ConditionalOnBean(name = DEFAULT_FILTER_NAME)
 	public DelegatingFilterProxyRegistrationBean securityFilterChainRegistration(
@@ -71,6 +82,7 @@ public class SecurityFilterAutoConfiguration {
 		if (securityProperties.getFilter().getDispatcherTypes() == null) {
 			return null;
 		}
+		// 如果派发类型为空,表示拦截所有的派发类型 ...
 		return securityProperties.getFilter().getDispatcherTypes().stream()
 				.map((type) -> DispatcherType.valueOf(type.name()))
 				.collect(Collectors.toCollection(() -> EnumSet.noneOf(DispatcherType.class)));

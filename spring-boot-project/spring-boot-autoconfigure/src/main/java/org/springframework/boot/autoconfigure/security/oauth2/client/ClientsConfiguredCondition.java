@@ -33,18 +33,23 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
  * Condition that matches if any {@code spring.security.oauth2.client.registration}
  * properties are defined.
  *
+ * 它主要匹配(只要存在spring.security.oauth2.client.registration 属性存在定义) ...
+ *
  * @author Madhura Bhave
  * @since 2.1.0
  */
 
 public class ClientsConfiguredCondition extends SpringBootCondition {
 
+	// bindable ...
 	private static final Bindable<Map<String, OAuth2ClientProperties.Registration>> STRING_REGISTRATION_MAP = Bindable
 			.mapOf(String.class, OAuth2ClientProperties.Registration.class);
 
 	@Override
 	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+		// 消息构建器 ..
 		ConditionMessage.Builder message = ConditionMessage.forCondition("OAuth2 Clients Configured Condition");
+
 		Map<String, OAuth2ClientProperties.Registration> registrations = getRegistrations(context.getEnvironment());
 		if (!registrations.isEmpty()) {
 			return ConditionOutcome.match(message.foundExactly("registered clients " + registrations.values().stream()
@@ -54,6 +59,9 @@ public class ClientsConfiguredCondition extends SpringBootCondition {
 	}
 
 	private Map<String, OAuth2ClientProperties.Registration> getRegistrations(Environment environment) {
+		/**
+		 * 从环境中获取Binder ... 然后绑定 spring.security.oauth2.client.registration 到Map
+		 */
 		return Binder.get(environment).bind("spring.security.oauth2.client.registration", STRING_REGISTRATION_MAP)
 				.orElse(Collections.emptyMap());
 	}

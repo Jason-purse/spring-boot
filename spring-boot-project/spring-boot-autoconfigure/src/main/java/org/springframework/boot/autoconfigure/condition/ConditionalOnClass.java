@@ -34,6 +34,9 @@ import org.springframework.context.annotation.Conditional;
  * separate {@code Configuration} class, in particular if the return type of the method
  * matches the {@link #value target of the condition}.
  *
+ * 在Value上指定的类 作为配置类的注解元数据 能够通过ASM 在类加载之前解析 ...(配置类解析过程中,会通过ASM 读取配置类中的@Bean方法) ...
+ * 非常小心的是 当放置在@Bean方法上的时候,需要隔离condition在在独立的Configuration 类上,特别是这个方法的返回类型匹配 condition的目标 ...
+ *
  * @author Phillip Webb
  * @since 1.0.0
  */
@@ -50,12 +53,18 @@ public @interface ConditionalOnClass {
 	 * <b>not</b> if this annotation is used as a composed, meta-annotation. In order to
 	 * use this annotation as a meta-annotation, only use the {@link #name} attribute.
 	 * @return the classes that must be present
+	 *
+	 *
+	 * 类必须出现在类路径上,因此这些注解必须通过加载类字节码解析 , 在这里指定类是安全的(也许它最终不在类路径上) ,
+	 * 并且此注解应该直接出现在组件上(才有效) ,如果作为组合的,元注解是不会生效的 ..
+	 * 为了将这个注解使用为元注解,需要使用 name属性 ...
 	 */
 	Class<?>[] value() default {};
 
 	/**
 	 * The classes names that must be present.
 	 * @return the class names that must be present.
+	 *
 	 */
 	String[] name() default {};
 

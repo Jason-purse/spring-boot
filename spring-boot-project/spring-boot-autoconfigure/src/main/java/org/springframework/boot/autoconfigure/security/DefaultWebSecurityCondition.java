@@ -41,6 +41,9 @@ class DefaultWebSecurityCondition extends AllNestedConditions {
 
 	}
 
+	// 如果缺少 WebSecurityConfigurerAdapter /  SecurityFilterChain,就直接启动注解 @WebSecurity 进行默认的配置开启 ...
+	// 一般来说不在建议 用户直接使用 WebSecurityConfigurerAdapter, 建议直接使用 SecuriityFilterChain 直接进行处理 ..
+	// 那么SecurityFilterChain 的自动配置将会失效 ...
 	@ConditionalOnMissingBean({ WebSecurityConfigurerAdapter.class, SecurityFilterChain.class })
 	static class Beans {
 

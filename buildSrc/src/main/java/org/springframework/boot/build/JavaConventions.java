@@ -24,9 +24,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import io.spring.javaformat.gradle.SpringJavaFormatPlugin;
-import io.spring.javaformat.gradle.tasks.CheckFormat;
-import io.spring.javaformat.gradle.tasks.Format;
+
 import org.gradle.api.JavaVersion;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
@@ -200,8 +198,8 @@ class JavaConventions {
 
 			// https://docs.gradle.org/current/userguide/tutorial_using_tasks.html#sec:task_dependencies
 			// 包括动态任务增加 ...
-			project.getTasks().withType(Checkstyle.class, (checkstyle) -> test.mustRunAfter(checkstyle));
-			project.getTasks().withType(CheckFormat.class, (checkFormat) -> test.mustRunAfter(checkFormat));
+//			project.getTasks().withType(Checkstyle.class, (checkstyle) -> test.mustRunAfter(checkstyle));
+//			project.getTasks().withType(CheckFormat.class, (checkFormat) -> test.mustRunAfter(checkFormat));
 		});
 		// 一个项目可以有很多依赖,通过不同的Configuration 进行分类 ....
 		project.getPlugins().withType(JavaPlugin.class, (javaPlugin) -> project.getDependencies()
@@ -271,39 +269,56 @@ class JavaConventions {
 		return !project.hasProperty("toolchainVersion") && JavaVersion.current() == JavaVersion.VERSION_1_8;
 	}
 
-	private void configureSpringJavaFormat(Project project) {
-		project.getPlugins().apply(SpringJavaFormatPlugin.class);
-		project.getTasks().withType(Format.class, (Format) -> Format.setEncoding("UTF-8"));
-		project.getPlugins().apply(CheckstylePlugin.class);
-		CheckstyleExtension checkstyle = project.getExtensions().getByType(CheckstyleExtension.class);
-		checkstyle.setToolVersion("8.45.1");
-		checkstyle.getConfigDirectory().set(project.getRootProject().file("src/checkstyle"));
-		String version = SpringJavaFormatPlugin.class.getPackage().getImplementationVersion();
-		DependencySet checkstyleDependencies = project.getConfigurations().getByName("checkstyle").getDependencies();
-		// 不适用spring.javaformat
-		//checkstyleDependencies
-		//		.add(project.getDependencies().create("io.spring.javaformat:spring-javaformat-checkstyle:" + version));
-	}
+//	private void configureSpringJavaFormat(Project project) {
+//		project.getPlugins().apply(SpringJavaFormatPlugin.class);
+//		project.getTasks().withType(Format.class, (Format) -> Format.setEncoding("UTF-8"));
+//		project.getPlugins().apply(CheckstylePlugin.class);
+//		CheckstyleExtension checkstyle = project.getExtensions().getByType(CheckstyleExtension.class);
+//		checkstyle.setToolVersion("8.45.1");
+//		checkstyle.getConfigDirectory().set(project.getRootProject().file("src/checkstyle"));
+//		String version = SpringJavaFormatPlugin.class.getPackage().getImplementationVersion();
+//		DependencySet checkstyleDependencies = project.getConfigurations().getByName("checkstyle").getDependencies();
+//		// 不适用spring.javaformat
+//		//checkstyleDependencies
+//		//		.add(project.getDependencies().create("io.spring.javaformat:spring-javaformat-checkstyle:" + version));
+//	}
 
 	private void configureDependencyManagement(Project project) {
 		ConfigurationContainer configurations = project.getConfigurations();
+		// 创建一个配置,名为依赖管理 ... 不可见,且不能够被消费,无法被解析 ...
 		Configuration dependencyManagement = configurations.create("dependencyManagement", (configuration) -> {
 			configuration.setVisible(false);
 			configuration.setCanBeConsumed(false);
 			configuration.setCanBeResolved(false);
 		});
+
+		// 匹配 ***Classpath的配置 或者 注解处理器 ...
 		configurations
 				.matching((configuration) -> configuration.getName().endsWith("Classpath")
 						|| JavaPlugin.ANNOTATION_PROCESSOR_CONFIGURATION_NAME.equals(configuration.getName()))
 				.all((configuration) -> configuration.extendsFrom(dependencyManagement));
+
+
+		//从项目的依赖中,处理 ...
+		// 将它指定为一个平台依赖 ...
+		// Java Platform 插件 可以发布平台工件(平台工件 一般有两种 一种是不直接产生二进制包的,另一种是) ...
+		// 它的意思是增加一个项目依赖(但是类型是bom) ...
 		Dependency springBootParent = project.getDependencies().enforcedPlatform(project.getDependencies()
 				.project(Collections.singletonMap("path", ":spring-boot-project:spring-boot-parent")));
 		dependencyManagement.getDependencies().add(springBootParent);
-		project.getPlugins().withType(OptionalDependenciesPlugin.class, (optionalDependencies) -> configurations
-				.getByName(OptionalDependenciesPlugin.OPTIONAL_CONFIGURATION_NAME).extendsFrom(dependencyManagement));
+
+		// 可选依赖插件 ..
+		// 例如 项目使用了可选依赖插件 ... 配置插件 ...
+		// 这里返回的集合是活的 ... 任何动作都会被 重复 ...(例如新增一个元素到集合中 / 或者原始集合中新增了一个匹配此过滤器的元素) ..
+		project.getPlugins().withType(OptionalDependenciesPlugin.class, (optionalDependencies) ->  {
+			// 从配置中 获取 optional 让它也继承于依赖管理
+			configurations
+					.getByName(OptionalDependenciesPlugin.OPTIONAL_CONFIGURATION_NAME).extendsFrom(dependencyManagement);
+		});
 	}
 
 	private void configureToolchain(Project project) {
+		// 有工具链,为测试定制一些事情 ...
 		project.getPlugins().apply(ToolchainPlugin.class);
 	}
 

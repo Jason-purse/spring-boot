@@ -1,5 +1,6 @@
-package club.smileboy.app;
+package club.smileboy.app.classLoader;
 
+import org.gradle.internal.impldep.org.apache.commons.lang.math.Fraction;
 import org.junit.jupiter.api.Test;
 import sun.misc.Launcher;
 
@@ -75,7 +76,7 @@ public class ClassLoaderTests {
 
 	@Test
 	public void nestJarTests() {
-
+		System.out.println(Fraction.ONE_FIFTH);
 
 	}
 
@@ -127,5 +128,11 @@ public class ClassLoaderTests {
 		public static void main(String[] args) {
 			System.out.println(JarURLConnection.getFileNameMap());
 		}
+	}
+
+
+	@Test
+	public void findApplicationClassPathByTests() {
+		System.out.println(System.getProperty("java.class.path"));
 	}
 }

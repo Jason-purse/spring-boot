@@ -26,6 +26,8 @@ import java.util.function.UnaryOperator;
  * Simple cache that uses a {@link SoftReference} to cache a value for as long as
  * possible.
  *
+ * 使用SoftReference 简单的缓存一个值 ...
+ *
  * @param <T> the value type
  * @author Phillip Webb
  */

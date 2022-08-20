@@ -58,6 +58,8 @@ import org.springframework.validation.annotation.Validated;
  * Internal class used by the {@link ConfigurationPropertiesBindingPostProcessor} to
  * handle the actual {@link ConfigurationProperties @ConfigurationProperties} binding.
  *
+ * 后置处理器内部使用的类(被用来处理 @ConfigurationProperties 绑定) ...
+ *
  * @author Stephane Nicoll
  * @author Phillip Webb
  */
@@ -83,15 +85,24 @@ class ConfigurationPropertiesBinder {
 
 	ConfigurationPropertiesBinder(ApplicationContext applicationContext) {
 		this.applicationContext = applicationContext;
+
 		this.propertySources = new PropertySourcesDeducer(applicationContext).getPropertySources();
+
+		// 配置属性验证器
 		this.configurationPropertiesValidator = getConfigurationPropertiesValidator(applicationContext);
+		// jsr 303 是否出现 ...
 		this.jsr303Present = ConfigurationPropertiesJsr303Validator.isJsr303Present(applicationContext);
 	}
 
+	// 配置属性绑定器进行绑定 ...
 	BindResult<?> bind(ConfigurationPropertiesBean propertiesBean) {
+		// 获取绑定目标 ..
 		Bindable<?> target = propertiesBean.asBindTarget();
 		ConfigurationProperties annotation = propertiesBean.getAnnotation();
+		// 根据注解拿取绑定处理器 ..
+		// 通过装饰器模式 返回了一个bindHandler ...
 		BindHandler bindHandler = getBindHandler(target, annotation);
+		//
 		return getBinder().bind(annotation.prefix(), target, bindHandler);
 	}
 
@@ -109,20 +120,31 @@ class ConfigurationPropertiesBinder {
 		return null;
 	}
 
+
+	// 获取绑定处理器 ..
 	private <T> BindHandler getBindHandler(Bindable<T> target, ConfigurationProperties annotation) {
+
 		List<Validator> validators = getValidators(target);
+
 		BindHandler handler = getHandler();
 		handler = new ConfigurationPropertiesBindHandler(handler);
+
+		// 这里使用到了装饰器模式 ...
 		if (annotation.ignoreInvalidFields()) {
+			// 如果忽略无效属性 ...
 			handler = new IgnoreErrorsBindHandler(handler);
 		}
+
+		// 如果不忽略 ...
 		if (!annotation.ignoreUnknownFields()) {
 			UnboundElementsSourceFilter filter = new UnboundElementsSourceFilter();
 			handler = new NoUnboundElementsBindHandler(handler, filter);
 		}
 		if (!validators.isEmpty()) {
+			// 给上验证绑定处理器
 			handler = new ValidationBindHandler(handler, validators.toArray(new Validator[0]));
 		}
+
 		for (ConfigurationPropertiesBindHandlerAdvisor advisor : getBindHandlerAdvisors()) {
 			handler = advisor.apply(handler);
 		}
@@ -130,20 +152,28 @@ class ConfigurationPropertiesBinder {
 	}
 
 	private IgnoreTopLevelConverterNotFoundBindHandler getHandler() {
+		// 获取Bound ... properties ...
 		BoundConfigurationProperties bound = BoundConfigurationProperties.get(this.applicationContext);
+
 		return (bound != null)
+				// 如果没有转换器忽略异常,但是  绑定过程交给了代理 ...
 				? new IgnoreTopLevelConverterNotFoundBindHandler(new BoundPropertiesTrackingBindHandler(bound::add))
+				// 表示没有配置 ...
 				: new IgnoreTopLevelConverterNotFoundBindHandler();
 	}
 
+	// 可绑定对象中获取 验证器 ...
 	private List<Validator> getValidators(Bindable<?> target) {
+
 		List<Validator> validators = new ArrayList<>(3);
 		if (this.configurationPropertiesValidator != null) {
 			validators.add(this.configurationPropertiesValidator);
 		}
+		// jsr303 并且如果它有Validated 注解 ..
 		if (this.jsr303Present && target.getAnnotation(Validated.class) != null) {
 			validators.add(getJsr303Validator());
 		}
+		// 如果它本身是一个校验器 ??? 也不是不行 ...
 		if (target.getValue() != null && target.getValue().get() instanceof Validator) {
 			validators.add((Validator) target.getValue().get());
 		}
@@ -152,18 +182,23 @@ class ConfigurationPropertiesBinder {
 
 	private Validator getJsr303Validator() {
 		if (this.jsr303Validator == null) {
+			// 直接使用 ConfigurationPropertiesJsr303Validator
 			this.jsr303Validator = new ConfigurationPropertiesJsr303Validator(this.applicationContext);
 		}
 		return this.jsr303Validator;
 	}
 
 	private List<ConfigurationPropertiesBindHandlerAdvisor> getBindHandlerAdvisors() {
+		// 还可以有 advisor(顾问) ...??
 		return this.applicationContext.getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class).orderedStream()
 				.collect(Collectors.toList());
 	}
 
+	// 获取binder ..
 	private Binder getBinder() {
+
 		if (this.binder == null) {
+			// 重新new 一个 Binder ...
 			this.binder = new Binder(getConfigurationPropertySources(), getPropertySourcesPlaceholdersResolver(),
 					getConversionServices(), getPropertyEditorInitializer(), null,
 					ConfigurationPropertiesBindConstructorProvider.INSTANCE);
@@ -191,12 +226,15 @@ class ConfigurationPropertiesBinder {
 	}
 
 	static void register(BeanDefinitionRegistry registry) {
+		// 工厂
 		if (!registry.containsBeanDefinition(FACTORY_BEAN_NAME)) {
 			BeanDefinition definition = BeanDefinitionBuilder
 					.rootBeanDefinition(ConfigurationPropertiesBinder.Factory.class).getBeanDefinition();
 			definition.setRole(BeanDefinition.ROLE_INFRASTRUCTURE);
 			registry.registerBeanDefinition(ConfigurationPropertiesBinder.FACTORY_BEAN_NAME, definition);
 		}
+		// bean ..
+		// 然后它就创建出 ConfigurationPropertiesBinder
 		if (!registry.containsBeanDefinition(BEAN_NAME)) {
 			BeanDefinition definition = BeanDefinitionBuilder
 					.rootBeanDefinition(ConfigurationPropertiesBinder.class,
@@ -236,6 +274,8 @@ class ConfigurationPropertiesBinder {
 	/**
 	 * {@link BindHandler} to deal with
 	 * {@link ConfigurationProperties @ConfigurationProperties} concerns.
+	 *
+	 * 用BinderHandler 处理 ConfigurationProperties ..
 	 */
 	private static class ConfigurationPropertiesBindHandler extends AbstractBindHandler {
 
@@ -246,6 +286,7 @@ class ConfigurationPropertiesBinder {
 		@Override
 		public <T> Bindable<T> onStart(ConfigurationPropertyName name, Bindable<T> target, BindContext context) {
 			return isConfigurationProperties(target.getType().resolve())
+					// 给定绑定约束(非直接属性也可以绑定) ..
 					? target.withBindRestrictions(BindRestriction.NO_DIRECT_PROPERTY) : target;
 		}
 

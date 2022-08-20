@@ -22,6 +22,8 @@ import org.springframework.boot.context.properties.source.ConfigurationPropertyN
  * Callback interface that can be used to handle additional logic during element
  * {@link Binder binding}.
  *
+ * 这是一个回调接口(被用来处理额外的逻辑, 在元素绑定过程中) ...
+ *
  * @author Phillip Webb
  * @author Madhura Bhave
  * @since 2.0.0

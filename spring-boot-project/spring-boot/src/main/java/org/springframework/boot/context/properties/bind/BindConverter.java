@@ -48,6 +48,8 @@ import org.springframework.util.CollectionUtils;
  * Utility to handle any conversion needed during binding. This class is not thread-safe
  * and so a new instance is created for each top-level bind.
  *
+ * 处理在绑定过程中需要的任何转换,这个类不是线程安全的,因此 每一个顶级绑定创建一个新的实例...
+ *
  * @author Phillip Webb
  * @author Andy Wilkinson
  */

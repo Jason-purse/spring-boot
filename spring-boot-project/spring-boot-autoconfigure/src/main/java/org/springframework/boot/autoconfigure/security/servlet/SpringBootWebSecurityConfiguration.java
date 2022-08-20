@@ -35,6 +35,9 @@ import org.springframework.security.web.SecurityFilterChain;
  * specify all the bits that they want to configure as part of the custom security
  * configuration.
  *
+ *
+ * web Security的默认配置, 它依赖于Spring Security的内容协商策略去决定(那种类型的认证使用) ..
+ * 如果用户指定了它们自己的WebSecurityConfigurerAdapter  或者SecurityFilterChain , 那么这将会避让 并且用户应该指定所有的细节(关于想要配置自定义安全配置的一部分) ...
  * @author Madhura Bhave
  */
 @Configuration(proxyBeanMethods = false)
@@ -42,6 +45,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @ConditionalOnWebApplication(type = Type.SERVLET)
 class SpringBootWebSecurityConfiguration {
 
+	/**
+	 * 这里使用优先级的原因就是,相对于注册到servlet的容器的其他过滤器  有一个优先级顺序 ...
+	 * @param http
+	 * @return
+	 * @throws Exception
+	 */
 	@Bean
 	@Order(SecurityProperties.BASIC_AUTH_ORDER)
 	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
