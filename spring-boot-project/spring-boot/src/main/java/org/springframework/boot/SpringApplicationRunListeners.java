@@ -43,7 +43,7 @@ class SpringApplicationRunListeners {
 
 	private final List<SpringApplicationRunListener> listeners;
 
-	private final ApplicationStartup applicationStartup;
+	private final ApplicationStartup applicationStartup; // DefaultApplicationStartUp
 
 	SpringApplicationRunListeners(Log log, Collection<? extends SpringApplicationRunListener> listeners,
 			ApplicationStartup applicationStartup) {

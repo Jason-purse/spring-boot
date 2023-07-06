@@ -56,7 +56,7 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 	private final SpringApplication application;
 
 	private final String[] args;
-
+	// 多播器 用于广播时间
 	private final SimpleApplicationEventMulticaster initialMulticaster;
 
 	public EventPublishingRunListener(SpringApplication application, String[] args) {

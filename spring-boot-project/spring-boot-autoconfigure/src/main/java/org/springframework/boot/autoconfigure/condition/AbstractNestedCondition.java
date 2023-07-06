@@ -37,6 +37,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 /**
+ * 嵌套条件的抽象基类。
  * Abstract base class for nested conditions.
  *
  * @author Phillip Webb
